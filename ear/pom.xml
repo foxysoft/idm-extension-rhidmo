@@ -1,0 +1,30 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.foxysoft.idm</groupId>
+  <artifactId>rhidmo-ear</artifactId>
+  <packaging>ear</packaging>
+  <version>1.0</version>
+  <name>rhidmo-ear</name>
+  <dependencies>
+    <dependency>
+      <groupId>de.foxysoft.idm</groupId>
+      <artifactId>rhidmo-servlet</artifactId>
+      <type>war</type>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -1,0 +1,22 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.foxysoft.idm</groupId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+  <artifactId>rhidmo</artifactId>
+  <name>rhidmo</name>
+  <modules>
+    <module>servlet</module>
+    <module>ear</module>
+  </modules>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>de.foxysoft.idm</groupId>
+        <artifactId>rhidmo-servlet</artifactId>
+        <version>1.0</version>
+        <type>war</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
