@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Ext-SDM-SDA-Comp-Version: 1
+softwaretype: J2EE
+JarSAP-Standalone-Version: 20090803.1000
+JarSAPProcessing-Version: 20161220.1300
+deployfile: SDA_DD.xml
+archivetype: DC
+keyname: rhidmo
+keyvendor: de.foxysoft
+keylocation: foxysoft
+keycounter: 1
+componentelement: <componentelement  name="rhidmo" vendor="de.foxysoft" componenttype="D
+ C" subsystem="NO_SUBSYS" location="foxysoft" counter="1" deltaversion=
+ "F" updateversion="LB-20170530150922" componentprovider="foxysoft" arc
+ hivetype="DC"/> 
+JarSL-Version: 20100616.1800
+compress: true
+
