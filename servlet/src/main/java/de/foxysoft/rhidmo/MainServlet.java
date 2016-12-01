@@ -1,6 +1,9 @@
 package de.foxysoft.rhidmo;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,12 +21,18 @@ public class MainServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		String content = null;
 		try {
 			Test.main(null);
+			content = "It worked";
 		} catch (Exception e) {
-			throw new ServletException(e);
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			content = pw.toString();
 		}
 		response.setContentType("text/html");
-		response.getWriter().println("<html><body>It worked</body></html>");
+		response.getWriter().println(
+				"<html><body><pre>" + content + "</pre></body></html>");
 	}
 }
