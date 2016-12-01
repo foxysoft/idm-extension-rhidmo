@@ -8,7 +8,8 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
 public class JunctionClassLoader extends ClassLoader {
-	private static class CompoundEnumeration<E> implements Enumeration<E> {
+	private static class CompoundEnumeration<E>
+			implements Enumeration<E> {
 		private Enumeration<E>[] enums;
 		private int index = 0;
 
@@ -18,7 +19,8 @@ public class JunctionClassLoader extends ClassLoader {
 
 		private boolean next() {
 			while (index < enums.length) {
-				if (enums[index] != null && enums[index].hasMoreElements()) {
+				if (enums[index] != null
+						&& enums[index].hasMoreElements()) {
 					return true;
 				}
 				index++;
@@ -46,7 +48,8 @@ public class JunctionClassLoader extends ClassLoader {
 	}
 
 	@Override
-	public Class<?> loadClass(String name) throws ClassNotFoundException {
+	public Class<?> loadClass(String name)
+			throws ClassNotFoundException {
 		Class<?> result = null;
 		for (int i = 0; i < m_delegates.length && result == null; ++i) {
 			try {
@@ -72,11 +75,13 @@ public class JunctionClassLoader extends ClassLoader {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Enumeration<URL> getResources(String name) throws IOException {
+	public Enumeration<URL> getResources(String name)
+			throws IOException {
 		Enumeration<URL> result = null;
-		ArrayList<Enumeration<URL>> tmp = new ArrayList<Enumeration<URL>>(m_delegates.length);
+		ArrayList<Enumeration<URL>> tmp = new ArrayList<Enumeration<URL>>(
+				m_delegates.length);
 		IOException e = null;
-	
+
 		for (int i = 0; i < m_delegates.length; ++i) {
 			try {
 				tmp.add(m_delegates[i].getResources(name));
@@ -85,7 +90,8 @@ public class JunctionClassLoader extends ClassLoader {
 			}
 		}
 
-		result = new CompoundEnumeration<URL>((Enumeration<URL>[]) tmp.toArray());
+		result = new CompoundEnumeration<URL>(
+				(Enumeration<URL>[]) tmp.toArray());
 		if (result.hasMoreElements() || e == null) {
 			return result;
 		} else {

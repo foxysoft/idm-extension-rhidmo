@@ -20,7 +20,8 @@ public class MainServlet extends HttpServlet {
 	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+			HttpServletResponse response)
+			throws ServletException, IOException {
 		String content = null;
 		try {
 			Test.main(null);
@@ -32,7 +33,8 @@ public class MainServlet extends HttpServlet {
 			content = sw.toString();
 		}
 		response.setContentType("text/html");
-		response.getWriter().println(
-				"<html><body><pre>" + content + "</pre></body></html>");
+		response.getWriter()
+				.println("<html><body><pre>" + content
+						+ "</pre></body></html>");
 	}
 }

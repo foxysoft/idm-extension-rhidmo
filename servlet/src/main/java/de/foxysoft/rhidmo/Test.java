@@ -16,28 +16,51 @@ public class Test {
 		Object o = ctx.lookup("IDM");
 		trc(M + "o = " + o);
 
-		// The JMX class loader has access to all the IDM Extension Framework classes
-		ClassLoader jmxClassLoader = o.getClass().getClassLoader();
+		// The JMX class loader has access
+		// to all the IDM Extension Framework classes
+		ClassLoader jmxClassLoader = o.getClass()
+				.getClassLoader();
 		trc(M + "jmxClassLoader = " + jmxClassLoader);
 
 		// The context classloader has access to all Rhidmo classes
-		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader contextClassLoader = Thread.currentThread()
+				.getContextClassLoader();
 		trc(M + "contextClassLoader = " + contextClassLoader);
 
-		// The junction classloader combines both using delegation 
-		ClassLoader junctionClassLoader = new JunctionClassLoader(contextClassLoader, jmxClassLoader);
+		// The junction classloader combines both using delegation
+		ClassLoader junctionClassLoader = new JunctionClassLoader(
+				contextClassLoader, jmxClassLoader);
 
-		Class<?> baseClass = Class.forName("com.sap.idm.extension.TaskProcessingAdapter", true, jmxClassLoader);
-		trc(M + "c.getName() = " + baseClass.getName());
-		Class<?> subClass = new ByteBuddy().subclass(baseClass).name("de.foxysoft.rhidmo.TaskProcessing")
-				.method(ElementMatchers.named("onSubmit")).intercept(MethodDelegation.to(Test.class))
-				.method(ElementMatchers.named("onLoad")).intercept(MethodDelegation.to(Test.class)).make()
-				.load(junctionClassLoader).getLoaded();
+		// Get adapter base class from JMX class loader
+		Class<?> baseClass = Class.forName(
+				"com.sap.idm.extension.TaskProcessingAdapter",
+				true,
+				jmxClassLoader);
+		trc(M + "baseClass.getName() = " + baseClass.getName());
+
+		// Create a new sub class dynamically
+		// which intercepts onLoad and onSubmit
+		Class<?> subClass = new ByteBuddy().subclass(baseClass)
+				.name("de.foxysoft.rhidmo.TaskProcessing")
+				.method(ElementMatchers.named("onSubmit"))
+				.intercept(MethodDelegation.to(Test.class))
+				.method(ElementMatchers.named("onLoad"))
+				.intercept(MethodDelegation.to(Test.class))
+				.make()
+				.load(junctionClassLoader)
+				.getLoaded();
 		trc(M + "subClass.getName() = " + subClass.getName());
 
-		Class<?> interfaceClass = Class.forName("com.sap.idm.extension.ITaskProcessing", true, jmxClassLoader);
-		o.getClass().getMethod("registerTaskProcessingInterface", new Class<?>[] { interfaceClass }).invoke(o,
-				new Object[] { subClass.newInstance() });
+		// Register the sub class as task processing plug-in
+		Class<?> interfaceClass = Class.forName(
+				"com.sap.idm.extension.ITaskProcessing",
+				true,
+				jmxClassLoader);
+		o.getClass()
+				.getMethod("registerTaskProcessingInterface",
+						new Class<?>[] { interfaceClass })
+				.invoke(o,
+						new Object[] { subClass.newInstance() });
 		trc(M + "subClass registered");
 	}
 
@@ -47,21 +70,30 @@ public class Test {
 	}
 
 	/**
-	 * public IdMValueChange[] onSubmit( Locale locale , int subjectMSKEY , int
-	 * objectMSKEY , Task task , IdMSubmitData validate)
+	 * public IdMValueChange[] onSubmit( Locale locale 
+	 * , int subjectMSKEY 
+	 * , int objectMSKEY 
+	 * , Task task 
+	 * , IdMSubmitData validate)
 	 * 
 	 * throws IdMExtensionException
 	 * 
 	 * @return
 	 */
-	public static @RuntimeType Object[] onSubmit(Locale locale, int subjectMSKEY, int objectMSKEY, Object task,
+	public static @RuntimeType Object[] onSubmit(Locale locale,
+			int subjectMSKEY,
+			int objectMSKEY,
+			Object task,
 			Object validate) {
 		final String M = "onSubmit: ";
 		trc(M + "called");
 		Object[] result = null;
 		try {
-			result = (Object[]) validate.getClass().getMethod("getChangeList", (Class<?>[]) null).invoke(validate,
-					(Object[]) null);
+			result = (Object[]) validate.getClass()
+					.getMethod("getChangeList",
+							(Class<?>[]) null)
+					.invoke(validate,
+							(Object[]) null);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -69,20 +101,30 @@ public class Test {
 	}
 
 	/**
-	 * public IdmValue[] onLoad( Locale locale , int subjectMSKEY , int
-	 * objectMSKEY , Task task , IdMLoadData data)
+	 * public IdmValue[] onLoad( Locale locale 
+	 * , int subjectMSKEY 
+	 * , int objectMSKEY 
+	 * , Task task 
+	 * , IdMLoadData data)
 	 * 
 	 * throws IdMExtensionException
 	 * 
 	 * @return
 	 */
-	public static @RuntimeType Object[] onLoad(Locale locale, int subjectMSKEY, int objectMSKEY, Object task,
+	public static @RuntimeType Object[] onLoad(Locale locale,
+			int subjectMSKEY,
+			int objectMSKEY,
+			Object task,
 			Object data) {
 		final String M = "onLoad: ";
 		trc(M + "called");
 		Object[] result = null;
 		try {
-			result = (Object[]) data.getClass().getMethod("getValues", (Class<?>[]) null).invoke(data, (Object[]) null);
+			result = (Object[]) data.getClass()
+					.getMethod("getValues",
+							(Class<?>[]) null)
+					.invoke(data,
+							(Object[]) null);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
