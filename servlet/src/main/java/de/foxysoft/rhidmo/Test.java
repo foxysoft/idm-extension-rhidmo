@@ -6,6 +6,7 @@ import javax.naming.InitialContext;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.matcher.ElementMatchers;
 
 public class Test {
@@ -51,7 +52,7 @@ public class Test {
 	 * 
 	 * @return
 	 */
-	public static Object[] onSubmit(Locale locale, int subjectMSKEY,
+	public static @RuntimeType Object[] onSubmit(Locale locale, int subjectMSKEY,
 			int objectMSKEY, Object task, Object validate) {
 		final String M = "onSubmit: ";
 		trc(M + "called");
@@ -74,8 +75,8 @@ public class Test {
 	 * 
 	 * @return
 	 */
-	public static Object[] onLoad(Locale locale, int subjectMSKEY,
-			int objectMSKEY, Object task, Object data) throws Exception {
+	public static @RuntimeType Object[] onLoad(Locale locale, int subjectMSKEY,
+			int objectMSKEY, Object task, Object data) {
 		final String M = "onLoad: ";
 		trc(M + "called");
 		Object[] result = null;

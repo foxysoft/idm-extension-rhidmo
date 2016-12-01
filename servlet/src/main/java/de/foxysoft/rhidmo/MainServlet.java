@@ -29,7 +29,7 @@ public class MainServlet extends HttpServlet {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
-			content = pw.toString();
+			content = sw.toString();
 		}
 		response.setContentType("text/html");
 		response.getWriter().println(
