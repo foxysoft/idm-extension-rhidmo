@@ -24,8 +24,8 @@ public class MainServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String content = null;
 		try {
-			Test.main(null);
-			content = "It worked";
+			Init.doInit();
+			content = "Success";
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
