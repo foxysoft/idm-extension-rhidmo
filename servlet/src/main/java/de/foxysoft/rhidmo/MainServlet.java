@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class MainServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final Log LOG = Log.get(MainServlet.class);
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -31,6 +32,7 @@ public class MainServlet extends HttpServlet {
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			content = sw.toString();
+			LOG.error(e);
 		}
 		response.setContentType("text/html");
 		response.getWriter()

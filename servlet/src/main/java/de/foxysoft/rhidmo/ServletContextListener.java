@@ -5,13 +5,9 @@ import java.io.StringWriter;
 
 import javax.servlet.ServletContextEvent;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ServletContextListener
 		implements javax.servlet.ServletContextListener {
-	private static Logger LOG = LoggerFactory
-			.getLogger(ServletContextListener.class);
+	private static final Log LOG = Log.get(ServletContextListener.class);
 
 	public void contextInitialized(ServletContextEvent event) {
 		final String M = "contextInitialized: ";

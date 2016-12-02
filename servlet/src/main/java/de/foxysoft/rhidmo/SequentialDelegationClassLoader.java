@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
-public class JunctionClassLoader extends ClassLoader {
+public class SequentialDelegationClassLoader extends ClassLoader {
 
 	private static class CompoundEnumeration<E>
 			implements Enumeration<E> {
@@ -43,7 +43,7 @@ public class JunctionClassLoader extends ClassLoader {
 
 	private ClassLoader[] m_delegates = null;
 
-	public JunctionClassLoader(ClassLoader... delegates) {
+	public SequentialDelegationClassLoader(ClassLoader... delegates) {
 		super(null);
 		m_delegates = delegates;
 	}
