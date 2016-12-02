@@ -30,6 +30,16 @@ public class Log {
 				args);
 	}
 
+	public void warn(String m) {
+		m_logger.warn(m);
+	}
+
+	public void warn(String m,
+			Object... args) {
+		m_logger.warn(m,
+				args);
+	}
+
 	public void error(String m) {
 		m_logger.debug(m);
 	}
