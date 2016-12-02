@@ -21,15 +21,9 @@ public class TaskProcessingStatic {
 		final String M = "TaskProcessingStatic.onSubmit: ";
 		Utl.trc(M + "Entering");
 		Object[] result = null;
-		try {
-			result = (Object[]) validate.getClass()
-					.getMethod("getChangeList",
-							(Class<?>[]) null)
-					.invoke(validate,
-							(Object[]) null);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+
+		// Return null to indicate: no changes to loaded data		
+		
 		Utl.trc(M + "Returning " + result);
 		return result;
 	}
@@ -50,15 +44,8 @@ public class TaskProcessingStatic {
 		final String M = "TaskProcessingStatic.onLoad: ";
 		Utl.trc(M + "Entering");
 		Object[] result = null;
-		try {
-			result = (Object[]) data.getClass()
-					.getMethod("getValues",
-							(Class<?>[]) null)
-					.invoke(data,
-							(Object[]) null);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+
+		// Return null to indicate: no changes to loaded data
 
 		Utl.trc(M + "Returning " + result);
 		return result;
