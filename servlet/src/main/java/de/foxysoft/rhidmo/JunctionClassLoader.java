@@ -8,6 +8,7 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
 public class JunctionClassLoader extends ClassLoader {
+
 	private static class CompoundEnumeration<E>
 			implements Enumeration<E> {
 		private Enumeration<E>[] enums;

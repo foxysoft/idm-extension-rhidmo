@@ -5,26 +5,34 @@ import java.io.StringWriter;
 
 import javax.servlet.ServletContextEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ServletContextListener
 		implements javax.servlet.ServletContextListener {
+	private static Logger LOG = LoggerFactory
+			.getLogger(ServletContextListener.class);
+
 	public void contextInitialized(ServletContextEvent event) {
-		final String M = "ServletContextListener.contextInitialized: ";
-		Utl.trc(M + "Entering");
+		final String M = "contextInitialized: ";
+		LOG.debug(M + "Entering");
 		try {
 			Init.doInit();
 		} catch (Exception e) {
+			// TODO: check writing of stacktrace by SLF4J
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
-			Utl.trc(M + sw);
+			LOG.error(M + "Exception occurred",
+					e);
 		}
-		Utl.trc(M + "Exiting");
+		LOG.debug(M + "Exiting");
 	}
 
 	public void contextDestroyed(ServletContextEvent event) {
-		final String M = "ServletContextListener.contextDestroyed: ";
-		Utl.trc(M + "Entering");
-		Utl.trc(M + "Exiting");
+		final String M = "contextDestroyed: ";
+		LOG.debug(M + "Entering");
+		LOG.debug(M + "Exiting");
 	}
 
 }
