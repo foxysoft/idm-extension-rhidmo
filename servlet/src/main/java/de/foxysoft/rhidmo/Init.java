@@ -2,12 +2,16 @@ package de.foxysoft.rhidmo;
 
 import javax.naming.InitialContext;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
+
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 
 public class Init {
-	private static final Log LOG = Log.get(Init.class);	
+
+	private static final Log LOG = Log.get(Init.class);
 	private static boolean g_initialized = false;
 
 	public static synchronized void doInit() throws Exception {
@@ -18,18 +22,21 @@ public class Init {
 
 			InitialContext ctx = new InitialContext();
 			Object idmFactory = ctx.lookup("IDM");
-			LOG.debug(M + "idmFactory = {}", idmFactory);
+			LOG.debug(M + "idmFactory = {}",
+					idmFactory);
 
 			// The JMX class loader has access
 			// to all the IDM Extension Framework classes
 			ClassLoader jmxClassLoader = idmFactory.getClass()
 					.getClassLoader();
-			LOG.debug(M + "jmxClassLoader = {}", jmxClassLoader);
+			LOG.debug(M + "jmxClassLoader = {}",
+					jmxClassLoader);
 
 			// The context classloader has access to all Rhidmo classes
 			ClassLoader contextClassLoader = Thread.currentThread()
 					.getContextClassLoader();
-			LOG.debug(M + "contextClassLoader = {}", contextClassLoader);
+			LOG.debug(M + "contextClassLoader = {}",
+					contextClassLoader);
 
 			// The junction classloader combines both using delegation
 			ClassLoader combinedClassLoader = new SequentialDelegationClassLoader(
@@ -40,7 +47,8 @@ public class Init {
 					"com.sap.idm.extension.TaskProcessingAdapter",
 					true,
 					jmxClassLoader);
-			LOG.debug(M + "baseClass.getName() = {}", baseClass.getName());
+			LOG.debug(M + "baseClass.getName() = {}",
+					baseClass.getName());
 
 			// Create a new sub class dynamically
 			// which intercepts onLoad and onSubmit
@@ -55,7 +63,8 @@ public class Init {
 					.make()
 					.load(combinedClassLoader)
 					.getLoaded();
-			LOG.debug(M + "subClass.getName() = {}", subClass.getName());
+			LOG.debug(M + "subClass.getName() = {}",
+					subClass.getName());
 
 			// Register the sub class as task processing plug-in
 			Class<?> interfaceClass = Class.forName(
@@ -68,6 +77,11 @@ public class Init {
 					.invoke(idmFactory,
 							new Object[] { subClass.newInstance() });
 			LOG.debug(M + "subClass registered");
+
+			ContextFactory.getGlobal()
+					.initApplicationClassLoader(combinedClassLoader);
+			LOG.debug(M + "Rhino classloader initialized");
+			
 			g_initialized = true;
 		} else {
 			LOG.debug(M + "Already initialized");

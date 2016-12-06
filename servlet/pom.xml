@@ -50,6 +50,18 @@
       <artifactId>slf4j-sap-logging</artifactId>
       <version>1.1</version>
     </dependency>
+    <!-- NOTE: this is a newer version than the one used in SAP IDM 8.0 -->
+    <!-- As of 8.0 SP4, SAP IDM still uses Rhino 1.5 release 2 2001 07 27 -->
+    <dependency>
+      <groupId>org.mozilla</groupId>
+      <artifactId>rhino</artifactId>
+      <version>1.7R4</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.10</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

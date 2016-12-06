@@ -12,8 +12,9 @@ public class Utl {
 		final String M = "getConnection: ";
 		LOG.debug(M + "Entering");
 		InitialContext ic = new InitialContext();
+		// TODO: lookup doesn't work with java:comp/env prefix
 		DataSource datasource = (DataSource) ic
-				.lookup("jdbc/notx/IDM_DataSource");
+				.lookup("jdbc/RHIDMO_RT");
 		Connection result = datasource.getConnection();
 		LOG.debug(M + "Returning {}",
 				result);
