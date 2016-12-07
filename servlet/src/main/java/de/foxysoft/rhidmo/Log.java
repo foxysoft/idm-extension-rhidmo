@@ -19,7 +19,7 @@ public class Log {
 	public static Log get(Class<?> c) {
 		return new Log(LoggerFactory.getLogger(c));
 	}
-	
+
 	public static Log get(String name) {
 		return new Log(LoggerFactory.getLogger(name));
 	}
@@ -55,9 +55,13 @@ public class Log {
 	}
 
 	public void error(Throwable t) {
+		m_logger.error(Log.getStackTrace(t));
+	}
+
+	public static String getStackTrace(Throwable t) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		t.printStackTrace(pw);
-		m_logger.error(sw.toString());
+		return sw.toString();
 	}
 }

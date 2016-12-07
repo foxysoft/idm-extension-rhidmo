@@ -116,14 +116,7 @@ public class TaskProcessingStatic {
 						Scriptable scope = context
 								.initStandardObjects();
 
-						FunctionObject fo = new FunctionObject(
-								"uWarning",
-								GlobalFunctions.class.getMethod("uWarning",
-										new Class<?>[] {
-												String.class }),
-								scope);
-						scope.put("uWarning", scope, fo);
-						LOG.debug(M+"Registered global function uWarning");
+						Utl.registerGlobalFunctions(scope);
 						
 						Scriptable thisObj = context.newObject(scope);
 
