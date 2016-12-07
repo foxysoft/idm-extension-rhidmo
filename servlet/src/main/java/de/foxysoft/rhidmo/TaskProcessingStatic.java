@@ -8,6 +8,7 @@ import java.util.Locale;
 import org.apache.commons.codec.binary.Base64;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
 
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
@@ -28,14 +29,12 @@ public class TaskProcessingStatic {
 			int objectMSKEY,
 			Object task,
 			Object validate) {
-		final String M = "onSubmit: ";
-		LOG.debug(M + "Entering");
-		Object[] result = null;
-
-		// Return null to indicate: no changes to loaded data
-
-		LOG.debug(M + "Returning " + result);
-		return result;
+		return service("ONSUBMIT",
+				locale,
+				subjectMSKEY,
+				objectMSKEY,
+				task,
+				validate);
 	}
 
 	/**
@@ -51,8 +50,23 @@ public class TaskProcessingStatic {
 			int objectMSKEY,
 			Object task,
 			Object data) {
-		final String M = "onLoad: ";
-		LOG.debug(M + "Entering");
+		return service("ONLOAD",
+				locale,
+				subjectMSKEY,
+				objectMSKEY,
+				task,
+				data);
+	}
+
+	public static Object[] service(String eventName,
+			Locale locale,
+			int subjectMSKEY,
+			int objectMSKEY,
+			Object task,
+			Object data) {
+		final String M = "service: ";
+		LOG.debug(M + "Entering eventName = {}",
+				eventName);
 		Object[] result = null;
 		String scriptDefinition = null;
 		Connection c = null;
@@ -72,7 +86,7 @@ public class TaskProcessingStatic {
 					.getMethod("getParameter",
 							new Class<?>[] { String.class })
 					.invoke(task,
-							new Object[] { "SCRIPT" });
+							new Object[] { eventName });
 			if (scriptName != null) {
 				c = Utl.getConnection();
 				ps = c.prepareStatement("select a.mcscriptdefinition"
@@ -98,8 +112,19 @@ public class TaskProcessingStatic {
 
 					Context context = Context.enter();
 					try {
+
 						Scriptable scope = context
 								.initStandardObjects();
+
+						FunctionObject fo = new FunctionObject(
+								"uWarning",
+								GlobalFunctions.class.getMethod("uWarning",
+										new Class<?>[] {
+												String.class }),
+								scope);
+						scope.put("uWarning", scope, fo);
+						LOG.debug(M+"Registered global function uWarning");
+						
 						Scriptable thisObj = context.newObject(scope);
 
 						Function f = context.compileFunction(scope,
@@ -150,9 +175,9 @@ public class TaskProcessingStatic {
 				} catch (Exception e) {
 				}
 		}
-		// Return null to indicate: no changes to loaded data
 
-		LOG.debug(M + "Returning " + result);
+		LOG.debug(M + "Returning {}",
+				result);
 		return result;
 	}
 }

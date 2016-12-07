@@ -19,6 +19,10 @@ public class Log {
 	public static Log get(Class<?> c) {
 		return new Log(LoggerFactory.getLogger(c));
 	}
+	
+	public static Log get(String name) {
+		return new Log(LoggerFactory.getLogger(name));
+	}
 
 	public void debug(String m) {
 		m_logger.debug(m);
