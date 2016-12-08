@@ -3,14 +3,15 @@ package de.foxysoft.rhidmo;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import javax.naming.InitialContext;
-import javax.script.ScriptEngine;
 import javax.sql.DataSource;
 
+import org.apache.commons.codec.binary.Base64;
 import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.Undefined;
 
 public class Utl {
 	private static final Log LOG = Log.get(Utl.class);
@@ -49,5 +50,63 @@ public class Utl {
 
 		} // if public static method
 	}
+
+	public static String getDecodedScript(String scriptName,
+			int taskId) throws Exception {
+		final String M = "getDecodedScript: ";
+		Connection c = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String decodedScript = null;
+
+		try {
+			c = Utl.getConnection();
+			ps = c.prepareStatement("select a.mcscriptdefinition"
+					+ "    from mc_package_scripts a"
+					+ "    inner join mxp_tasks b"
+					+ "    on a.mcpackageid=b.mcpackageid"
+					+ "    and b.taskid=?");
+			ps.setInt(1,
+					taskId);
+			ps.execute();
+			rs = ps.getResultSet();
+			if (rs.next()) {
+				String encodedScript = rs.getString(1)
+						.substring("{B64}".length());
+				LOG.debug(M + "encodedScript = {}",
+						encodedScript);
+
+				decodedScript = new String(
+						Base64.decodeBase64(encodedScript), "UTF-8");
+				LOG.debug(M + "decodedScript = {}",
+						decodedScript);
+			} // if(rs.next())
+			else {
+				throw new RuntimeException("Script " + scriptName
+						+ " not found in package of task " + taskId);
+			}
+		} finally {
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (Exception e) {
+				}
+			if (ps != null)
+				try {
+					ps.close();
+				} catch (Exception e) {
+				}
+			if (c != null)
+				try {
+					c.close();
+				} catch (Exception e) {
+				}
+		}
+
+		LOG.debug(M + "Returning {}",
+				decodedScript);
+		return decodedScript;
+
+	}// getDecodedScript
 
 }

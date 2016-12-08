@@ -1,41 +1,42 @@
 <project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>de.foxysoft.idm</groupId>
-  <artifactId>rhidmo-ear</artifactId>
-  <packaging>ear</packaging>
-  <version>1.0</version>
-  <name>rhidmo-ear</name>
-  <!-- Must wrap maven.build.timestamp into user property   -->
-  <!-- for successful use in resource filtering.            -->
-  <!-- See https://stackoverflow.com/questions/13228472     -->
-  <!-- This property is used in SAP_MANIFEST.MF as counter, -->
-  <!-- which basically represents the SDA version number.   -->
-  <properties>
-    <timestamp>${maven.build.timestamp}</timestamp>
-    <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>de.foxysoft.idm</groupId>
-      <artifactId>rhidmo-servlet</artifactId>
-      <type>war</type>
-      <version>1.0</version>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-ear-plugin</artifactId>
-        <version>2.10.1</version>
-        <configuration>
-          <filtering>true</filtering>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.foxysoft.idm</groupId>
+	<artifactId>rhidmo-ear</artifactId>
+	<packaging>ear</packaging>
+	<version>1.0</version>
+	<name>rhidmo-ear</name>
+	<!-- Must wrap maven.build.timestamp into user property -->
+	<!-- for successful use in resource filtering. -->
+	<!-- See https://stackoverflow.com/questions/13228472 -->
+	<!-- This property is used in SAP_MANIFEST.MF as counter, -->
+	<!-- which basically represents the SDA version number. -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>de.foxysoft.idm</groupId>
+			<artifactId>rhidmo-servlet</artifactId>
+			<type>war</type>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-ear-plugin</artifactId>
+				<version>2.10.1</version>
+				<configuration>
+					<filtering>true</filtering>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
