@@ -86,7 +86,9 @@ public class TaskProcessingStatic {
 
 					Scriptable scope = context.initStandardObjects();
 
-					Utl.registerGlobalFunctions(scope);
+					Utl.registerPublicStaticMethodsInScope(
+							GlobalFunctions.class,
+							scope);
 
 					Scriptable thisObj = context.newObject(scope);
 

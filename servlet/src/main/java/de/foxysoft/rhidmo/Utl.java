@@ -29,9 +29,9 @@ public class Utl {
 		return result;
 	}
 
-	public static void registerGlobalFunctions(Scriptable scope) {
+	public static void registerPublicStaticMethodsInScope(Class<?> c, Scriptable scope) {
 		final String M = "registerGlobalFunctions: ";
-		Method[] methods = GlobalFunctions.class.getMethods();
+		Method[] methods = c.getMethods();
 		FunctionObject functionObject = null;
 		for (int i = 0; i < methods.length; ++i) {
 			int modifiers = methods[i].getModifiers();
