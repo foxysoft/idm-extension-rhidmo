@@ -69,7 +69,7 @@ public class TaskProcessingStatic {
 				data);
 	}
 
-	public static Object[] service(String eventName,
+	private static Object[] service(String eventName,
 			Locale locale,
 			int subjectMSKEY,
 			int objectMSKEY,

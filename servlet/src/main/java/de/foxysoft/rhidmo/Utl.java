@@ -44,7 +44,8 @@ public class Utl {
 		return result;
 	}
 
-	public static void registerPublicStaticMethodsInScope(Class<?> c, Scriptable scope) {
+	public static void registerPublicStaticMethodsInScope(Class<?> c,
+			Scriptable scope) {
 		final String M = "registerGlobalFunctions: ";
 		Method[] methods = c.getMethods();
 		FunctionObject functionObject = null;
@@ -60,7 +61,8 @@ public class Utl {
 				scope.put(methodName,
 						scope,
 						functionObject);
-				LOG.debug(M + "Registered {}", methodName);
+				LOG.debug(M + "Registered {}",
+						methodName);
 			}
 
 		} // if public static method
@@ -69,6 +71,10 @@ public class Utl {
 	public static String getDecodedScript(String scriptName,
 			int taskId) throws Exception {
 		final String M = "getDecodedScript: ";
+		LOG.debug(M + "Entering scriptName={}, taskId={}",
+				scriptName,
+				taskId);
+
 		Connection c = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -80,9 +86,14 @@ public class Utl {
 					+ "    from mc_package_scripts a"
 					+ "    inner join mxp_tasks b"
 					+ "    on a.mcpackageid=b.mcpackageid"
-					+ "    and b.taskid=?");
+					+ "    and b.taskid=?"
+					+ "    where a.mcscriptname=?");
+
 			ps.setInt(1,
 					taskId);
+			ps.setString(2,
+					scriptName);
+
 			ps.execute();
 			rs = ps.getResultSet();
 			if (rs.next()) {
