@@ -60,7 +60,7 @@ public class Utl {
 				scope.put(methodName,
 						scope,
 						functionObject);
-				LOG.debug(M + "Registered {}" + methodName);
+				LOG.debug(M + "Registered {}", methodName);
 			}
 
 		} // if public static method
