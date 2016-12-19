@@ -13,17 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package de.foxysoft.rhidmo;
+package de.foxysoft.rhidmo.mock;
 
-public class ErrorException extends BaseException {
-	private final static long serialVersionUID = 1L;
 
-	public ErrorException(Throwable cause) {
-		super(cause);
-	}
+/**
+ * This is the part of com.sap.idm.extension.api.Task actually used by Rhidmo
+ */
+public interface Task {
+	public int getID();
 
-	public ErrorException(String m) {
-		super(m);
-	}
+	public String getParameter(String key);
 
 }

@@ -17,7 +17,6 @@ package de.foxysoft.rhidmo;
 
 import javax.naming.InitialContext;
 
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 
 import net.bytebuddy.ByteBuddy;

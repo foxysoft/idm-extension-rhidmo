@@ -20,11 +20,14 @@ import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.codec.binary.Base64;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
 
@@ -134,5 +137,72 @@ public class Utl {
 		return decodedScript;
 
 	}// getDecodedScript
+
+	public static List<String> getScriptNamesOfTask(Object task,
+			String eventName) throws Exception {
+		final String M = "getScriptNamesOfTask: ";
+
+		List<String> result = new ArrayList<String>();
+
+		String mainScriptName = (String) task.getClass()
+				.getMethod("getParameter",
+						new Class<?>[] { String.class })
+				.invoke(task,
+						new Object[] { eventName });
+
+		LOG.debug(M + "Main script: {} = {}",
+				eventName,
+				mainScriptName);
+
+		if (mainScriptName != null) {
+			result.add(mainScriptName);
+		} else {
+			throw new ErrorException(
+					"Missing task parameter " + eventName);
+		}
+
+		// Always try all parameter names from REQ0 to REQ9,
+		// and do not require continuous numbering. That is,
+		//
+		// REQ0 = x, REQ1 = y, REQ2 = z
+		//
+		// would be OK, as well as
+		//
+		// REQ3 = x, REQ5 = y, REQ9 = z
+		//
+		// Starting with key REQ10, however, keys are required
+		// to use CONTINUOUS numbering. The first key that
+		// does not exist will stop processing.
+		//
+		// REQ1 = x, REQ10 = y, REQ11 = z
+		//
+		// will be OK. However,
+		//
+		// REQ1 = x, REQ10 = y, REQ12 = z
+		//
+		// will NOT work as expected because the processing
+		// will stop after trying REQ11, which doesn't exist.
+		// Script z, given as REQ12, will not be loaded.
+		boolean haveMoreParameters = true;
+		for (int i = 0; i < 10 || haveMoreParameters; ++i) {
+			String requiredScriptParameterName = "REQ" + i;
+			String requiredScriptParameterValue = (String) task
+					.getClass()
+					.getMethod("getParameter",
+							new Class<?>[] { String.class })
+					.invoke(task,
+							new Object[] {
+									requiredScriptParameterName });
+			if (requiredScriptParameterValue != null) {
+				LOG.debug(M + "Required scripts: {} = {}",
+						requiredScriptParameterName,
+						requiredScriptParameterValue);
+				result.add(requiredScriptParameterValue);
+			} else {
+				haveMoreParameters = false; // ======= exit on next iteration
+			}
+		}
+		return result;
+	}
 
 }
