@@ -20,7 +20,9 @@ import java.util.Locale;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.UniqueTag;
 
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
@@ -80,6 +82,7 @@ public class TaskProcessingStatic {
 				eventName);
 		Object[] result = null;
 
+		// Begin OUTER try: handle ANY exception to ensure proper logging
 		try {
 
 			int taskId = (Integer) task.getClass()
@@ -108,15 +111,37 @@ public class TaskProcessingStatic {
 						GlobalFunctions.class,
 						scope);
 
-				Scriptable thisObj = context.newObject(scope);
-
-				Function f = context.compileFunction(scope,
-						scriptContent,
+				Script script = context.compileString(scriptContent,
 						scriptName,
 						1,
 						null);
-				LOG.debug(M + "f = {}",
-						f);
+				script.exec(context,
+						scope);
+
+				Object fo = scope.get(scriptName,
+						scope);
+				LOG.debug(M + "fo = {}",
+						fo);
+				if (UniqueTag.NOT_FOUND.equals(fo)) {
+					throw new ErrorException("Script " + scriptName
+							+ " doesn't define any property named "
+							+ scriptName);
+				}
+
+				if (false == (fo instanceof Function)) {
+					throw new ErrorException("Property " + scriptName
+							+ " is not a function. Class name: "
+							+ fo.getClass()
+									.getName());
+				}
+
+				Function f = (Function) fo;
+
+				Scriptable thisObj = context.newObject(scope);
+
+				// Begin INNER try: handle exceptions from JS function
+				// Case 1: IdMExtensionException from app to display UI message
+				// Case 2: any other exception from app or Rhino on error
 				try {
 
 					Object resultJS = f.call(context,
@@ -128,7 +153,8 @@ public class TaskProcessingStatic {
 					result = (Object[]) Context.jsToJava(resultJS,
 							Object[].class);
 
-				} catch (JavaScriptException jse) {
+				} // End INNER try
+				catch (JavaScriptException jse) {
 					Object jsObject = jse.getValue();
 					LOG.debug(M + "jsObject = {}",
 							jsObject);
@@ -156,18 +182,16 @@ public class TaskProcessingStatic {
 									+ "Application raised IdMExtensionException {}",
 									Log.getStackTrace(toThrow));
 
-							// Throw inner IdMExtensionException
-							throw toThrow;
+							// Case 1: IdMExtensionException => re-throw wrapped
+							throw new MessageException(toThrow);
 
-						} // if
-							// (idmExceptionClass.isInstance(idmExceptionObject))
+						} // if(idmExceptionClass.isInstance(idmExceptionObject))
 					} // if(idmExceptionObject != null)
 
-					// Otherwise log and throw original JavaScriptException
-					LOG.error(jse);
+					// Case 2: other JavaScriptException => re-throw as is
 					throw jse;
+				} // catch (JavaScriptException jse) {
 
-				} // catch(JavaScriptException e)
 			} // if (scriptName != null)
 			else {
 				LOG.warn(M
@@ -175,6 +199,12 @@ public class TaskProcessingStatic {
 						taskId,
 						eventName);
 			}
+		} // End OUTER try
+		catch (MessageException me) {
+			throw (Exception) me.getCause();
+		} catch (Exception e) {
+			LOG.error(e);
+			throw e;
 		} finally {
 			Context.exit();
 		}
