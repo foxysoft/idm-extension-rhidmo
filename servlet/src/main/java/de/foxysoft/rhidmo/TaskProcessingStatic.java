@@ -80,6 +80,7 @@ public class TaskProcessingStatic {
 				eventName);
 		Object[] result = null;
 
+		Context context = Context.enter();
 		try {
 
 			int taskId = (Integer) task.getClass()
@@ -99,8 +100,6 @@ public class TaskProcessingStatic {
 			if (scriptName != null) {
 				String scriptContent = Utl.getDecodedScript(scriptName,
 						taskId);
-
-				Context context = Context.enter();
 
 				Scriptable scope = context.initStandardObjects();
 
