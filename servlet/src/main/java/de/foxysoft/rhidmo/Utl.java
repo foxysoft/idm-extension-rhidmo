@@ -27,9 +27,12 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.codec.binary.Base64;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.FunctionObject;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.UniqueTag;
 
 public class Utl {
 	private static final Log LOG = Log.get(Utl.class);
@@ -71,72 +74,156 @@ public class Utl {
 		} // if public static method
 	}
 
-	public static String getDecodedScript(String scriptName,
+	public static Function execScriptsInScope(
+			List<PackageScript> packageScripts,
+			Scriptable scope,
+			Context context,
 			int taskId) throws Exception {
-		final String M = "getDecodedScript: ";
-		LOG.debug(M + "Entering scriptName={}, taskId={}",
-				scriptName,
-				taskId);
 
-		Connection c = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		String decodedScript = null;
+		final String M = "execScriptsInScope: ";
+		Function result = null;
 
-		try {
-			c = Utl.getConnection();
-			ps = c.prepareStatement("select a.mcscriptdefinition"
-					+ "    from mc_package_scripts a"
-					+ "    inner join mxp_tasks b"
-					+ "    on a.mcpackageid=b.mcpackageid"
-					+ "    and b.taskid=?"
-					+ "    where a.mcscriptname=?");
+		for (int i = 0; i < packageScripts.size(); ++i) {
+			PackageScript psi = packageScripts.get(i);
 
-			ps.setInt(1,
-					taskId);
-			ps.setString(2,
-					scriptName);
+			if (psi.getScriptSource() != null) {
+				Script script = context.compileString(
+						psi.getScriptSource(),
+						psi.getScriptName(),
+						1,
+						null);
 
-			ps.execute();
-			rs = ps.getResultSet();
-			if (rs.next()) {
-				String encodedScript = rs.getString(1)
-						.substring("{B64}".length());
-				LOG.debug(M + "encodedScript = {}",
-						encodedScript);
-
-				decodedScript = new String(
-						Base64.decodeBase64(encodedScript), "UTF-8");
-				LOG.debug(M + "decodedScript = {}",
-						decodedScript);
-			} // if(rs.next())
+				script.exec(context,
+						scope);
+			} // if
 			else {
-				throw new RuntimeException("Script " + scriptName
-						+ " not found in package of task " + taskId);
+				LOG.warn(M
+						+ "Script {} referenced by parameters of task {} does not exist",
+						psi.getScriptName(),
+						taskId);
 			}
-		} finally {
-			if (rs != null)
-				try {
-					rs.close();
-				} catch (Exception e) {
-				}
-			if (ps != null)
-				try {
-					ps.close();
-				} catch (Exception e) {
-				}
-			if (c != null)
-				try {
-					c.close();
-				} catch (Exception e) {
-				}
+		} // for (int i = 0; i < packageScripts.size(); ++i) {
+
+		String mainScriptName = packageScripts.get(0)
+				.getScriptName();
+		Object resultObj = scope.get(mainScriptName,
+				scope);
+
+		if (UniqueTag.NOT_FOUND.equals(resultObj)) {
+			throw new ErrorException("Script " + mainScriptName
+					+ " doesn't define any property named "
+					+ mainScriptName);
 		}
 
-		LOG.debug(M + "Returning {}",
-				decodedScript);
-		return decodedScript;
+		if (resultObj instanceof Function) {
+			result = (Function) resultObj;
+		} else {
+			throw new ErrorException("Property " + mainScriptName
+					+ " is not a function. Class name: "
+					+ resultObj.getClass()
+							.getName());
+		}
 
-	}// getDecodedScript
+		LOG.debug(M + "Returning ",
+				result);
+		return result;
+	}
+
+	public static void fetchScriptSource(
+			List<PackageScript> packageScripts,
+			int taskId) throws Exception {
+		final String M = "fetchScriptSource: ";
+		LOG.debug(M + "Entering packageScripts = {}",
+				packageScripts);
+		if (packageScripts != null && !packageScripts.isEmpty()) {
+			Connection c = null;
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			String decodedScript = null;
+
+			try {
+				c = Utl.getConnection();
+				StringBuffer sb = new StringBuffer(
+						"select a.mcscriptdefinition,"
+								+ "    a.mcscriptname"
+								+ "    from mc_package_scripts a"
+								+ "    inner join mxp_tasks b"
+								+ "    on a.mcpackageid=b.mcpackageid"
+								+ "    and b.taskid=?"
+								+ "    where a.mcscriptname in (");
+				for (int i = 0; i < packageScripts.size(); ++i) {
+					if (i > 0) {
+						sb.append(',');
+					}
+					sb.append('?');
+				}
+				sb.append(')');
+				String sql = sb.toString();
+				LOG.debug(M + "sql = {}",
+						sql);
+
+				ps = c.prepareStatement(sql);
+
+				ps.setInt(1,
+						taskId);
+
+				for (int i = 0; i < packageScripts.size(); ++i) {
+					ps.setString(2 + i,
+							packageScripts.get(i)
+									.getScriptName());
+				}
+
+				ps.execute();
+				rs = ps.getResultSet();
+
+				while (rs.next()) {
+					String scriptName = rs.getString(2);
+					LOG.debug(M + "scriptName = {}",
+							scriptName);
+
+					String encodedScript = rs.getString(1)
+							.substring("{B64}".length());
+					LOG.debug(M + "encodedScript = {}",
+							encodedScript);
+
+					decodedScript = new String(
+							Base64.decodeBase64(encodedScript),
+							"UTF-8");
+					LOG.debug(M + "decodedScript = {}",
+							decodedScript);
+
+					// Expect i <= 10, so O(i^2) cost for nested loop is
+					// acceptable
+					for (int i = 0; i < packageScripts.size(); ++i) {
+						PackageScript psi = packageScripts.get(i);
+						if (scriptName.equals(psi.getScriptName())) {
+							psi.setScriptSource(decodedScript);
+							break;
+						}
+					}
+				} // while(rs.next())
+			} finally {
+				if (rs != null)
+					try {
+						rs.close();
+					} catch (Exception e) {
+					}
+				if (ps != null)
+					try {
+						ps.close();
+					} catch (Exception e) {
+					}
+				if (c != null)
+					try {
+						c.close();
+					} catch (Exception e) {
+					}
+			}
+		} // if (packageScripts != null && !packageScripts.isEmpty()) {
+
+		LOG.debug(M + "Returning void, packageScripts = {}",
+				packageScripts);
+	}// getDecodedScripts
 
 	public static List<PackageScript> getScriptNamesOfTask(Object task,
 			String eventName) throws Exception {

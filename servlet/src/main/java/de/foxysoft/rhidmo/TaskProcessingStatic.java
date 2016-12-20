@@ -15,6 +15,7 @@
  ******************************************************************************/
 package de.foxysoft.rhidmo;
 
+import java.util.List;
 import java.util.Locale;
 
 import org.mozilla.javascript.Context;
@@ -93,112 +94,80 @@ public class TaskProcessingStatic {
 			LOG.debug(M + "taskId = {}",
 					taskId);
 
-			String scriptName = (String) task.getClass()
-					.getMethod("getParameter",
-							new Class<?>[] { String.class })
-					.invoke(task,
-							new Object[] { eventName });
+			List<PackageScript> packageScripts = Utl
+					.getScriptNamesOfTask(task,
+							eventName);
 
-			if (scriptName != null) {
-				String scriptContent = Utl.getDecodedScript(scriptName,
-						taskId);
+			Utl.fetchScriptSource(packageScripts,
+					taskId);
 
-				Context context = Context.enter();
+			Context context = Context.enter();
 
-				Scriptable scope = context.initStandardObjects();
+			Scriptable scope = context.initStandardObjects();
 
-				Utl.registerPublicStaticMethodsInScope(
-						GlobalFunctions.class,
-						scope);
+			Utl.registerPublicStaticMethodsInScope(
+					GlobalFunctions.class,
+					scope);
 
-				Script script = context.compileString(scriptContent,
-						scriptName,
-						1,
-						null);
-				script.exec(context,
-						scope);
+			Function f = Utl.execScriptsInScope(packageScripts,
+					scope,
+					context,
+					taskId);
 
-				Object fo = scope.get(scriptName,
-						scope);
-				LOG.debug(M + "fo = {}",
-						fo);
-				if (UniqueTag.NOT_FOUND.equals(fo)) {
-					throw new ErrorException("Script " + scriptName
-							+ " doesn't define any property named "
-							+ scriptName);
-				}
+			Scriptable thisObj = context.newObject(scope);
 
-				if (false == (fo instanceof Function)) {
-					throw new ErrorException("Property " + scriptName
-							+ " is not a function. Class name: "
-							+ fo.getClass()
-									.getName());
-				}
+			// Begin INNER try: handle exceptions from JS function
+			// Case 1: IdMExtensionException from app to display UI message
+			// Case 2: any other exception from app or Rhino on error
+			try {
 
-				Function f = (Function) fo;
+				Object resultJS = f.call(context,
+						scope,
+						thisObj,
+						new Object[] { locale, subjectMSKEY,
+								objectMSKEY, task, data });
 
-				Scriptable thisObj = context.newObject(scope);
+				result = (Object[]) Context.jsToJava(resultJS,
+						Object[].class);
 
-				// Begin INNER try: handle exceptions from JS function
-				// Case 1: IdMExtensionException from app to display UI message
-				// Case 2: any other exception from app or Rhino on error
-				try {
+			} // End INNER try
+			catch (JavaScriptException jse) {
+				Object jsObject = jse.getValue();
+				LOG.debug(M + "jsObject = {}",
+						jsObject);
 
-					Object resultJS = f.call(context,
-							scope,
-							thisObj,
-							new Object[] { locale, subjectMSKEY,
-									objectMSKEY, task, data });
+				Object idmExceptionObject = Context.jsToJava(jsObject,
+						Object.class);
+				LOG.debug(M + "idmExceptionObject = {}",
+						idmExceptionObject);
 
-					result = (Object[]) Context.jsToJava(resultJS,
-							Object[].class);
+				if (idmExceptionObject != null) {
+					ClassLoader combinedClassLoader = Context
+							.getCurrentContext()
+							.getApplicationClassLoader();
+					LOG.debug(M + "combinedClassLoader = {}",
+							combinedClassLoader);
+					Class<?> idmExceptionClass = Class.forName(
+							"com.sap.idm.extension.IdMExtensionException",
+							false,
+							combinedClassLoader);
+					if (idmExceptionClass
+							.isInstance(idmExceptionObject)) {
+						Exception toThrow = (Exception) idmExceptionObject;
+						LOG.debug(M
+								+ "Application raised IdMExtensionException {}",
+								Log.getStackTrace(toThrow));
 
-				} // End INNER try
-				catch (JavaScriptException jse) {
-					Object jsObject = jse.getValue();
-					LOG.debug(M + "jsObject = {}",
-							jsObject);
+						// Case 1: IdMExtensionException => re-throw wrapped
+						throw new MessageException(toThrow);
 
-					Object idmExceptionObject = Context.jsToJava(
-							jsObject,
-							Object.class);
-					LOG.debug(M + "idmExceptionObject = {}",
-							idmExceptionObject);
+					} // if(idmExceptionClass.isInstance(idmExceptionObject))
+				} // if(idmExceptionObject != null)
 
-					if (idmExceptionObject != null) {
-						ClassLoader combinedClassLoader = Context
-								.getCurrentContext()
-								.getApplicationClassLoader();
-						LOG.debug(M + "combinedClassLoader = {}",
-								combinedClassLoader);
-						Class<?> idmExceptionClass = Class.forName(
-								"com.sap.idm.extension.IdMExtensionException",
-								false,
-								combinedClassLoader);
-						if (idmExceptionClass
-								.isInstance(idmExceptionObject)) {
-							Exception toThrow = (Exception) idmExceptionObject;
-							LOG.debug(M
-									+ "Application raised IdMExtensionException {}",
-									Log.getStackTrace(toThrow));
+				// Case 2: other JavaScriptException => re-throw as is
+				throw jse;
+			} // catch (JavaScriptException jse) {
 
-							// Case 1: IdMExtensionException => re-throw wrapped
-							throw new MessageException(toThrow);
-
-						} // if(idmExceptionClass.isInstance(idmExceptionObject))
-					} // if(idmExceptionObject != null)
-
-					// Case 2: other JavaScriptException => re-throw as is
-					throw jse;
-				} // catch (JavaScriptException jse) {
-
-			} // if (scriptName != null)
-			else {
-				LOG.warn(M
-						+ "Task {} has no parameter {}; will do nothing",
-						taskId,
-						eventName);
-			}
 		} // End OUTER try
 		catch (MessageException me) {
 			throw (Exception) me.getCause();

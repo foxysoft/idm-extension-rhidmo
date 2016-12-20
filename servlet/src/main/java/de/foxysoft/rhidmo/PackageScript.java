@@ -87,4 +87,9 @@ public class PackageScript {
 	public int hashCode() {
 		return m_qualifiedName.hashCode();
 	}
+	
+	@Override
+	public String toString() {
+		return m_qualifiedName + ", has source: " + (m_scriptSource != null);
+	}
 }
