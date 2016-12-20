@@ -17,11 +17,24 @@ package de.foxysoft.rhidmo;
 
 public class PackageScript {
 
+	private String m_qualifiedName;
 	private String m_packageName;
 	private String m_scriptName;
 	private String m_scriptSource;
 
 	public PackageScript(String qualifiedName) {
+		if (qualifiedName == null) {
+			throw new ErrorException(
+					"Package script qualified name must not be null");
+		}
+
+		if (qualifiedName == "") {
+			throw new ErrorException(
+					"Package script qualified name must not be empty");
+		}
+
+		m_qualifiedName = qualifiedName;
+
 		int separatorIndex = qualifiedName.indexOf('/');
 		if (separatorIndex != -1) {
 			m_packageName = qualifiedName.substring(0,
@@ -58,4 +71,20 @@ public class PackageScript {
 		return m_scriptName;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof PackageScript) {
+			PackageScript other = (PackageScript) o;
+			return other.m_packageName == m_packageName
+					&& other.m_scriptName == m_scriptName
+					&& other.m_scriptSource == m_scriptSource;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return m_qualifiedName.hashCode();
+	}
 }

@@ -138,11 +138,11 @@ public class Utl {
 
 	}// getDecodedScript
 
-	public static List<String> getScriptNamesOfTask(Object task,
+	public static List<PackageScript> getScriptNamesOfTask(Object task,
 			String eventName) throws Exception {
 		final String M = "getScriptNamesOfTask: ";
 
-		List<String> result = new ArrayList<String>();
+		List<PackageScript> result = new ArrayList<PackageScript>();
 
 		String mainScriptName = (String) task.getClass()
 				.getMethod("getParameter",
@@ -155,7 +155,7 @@ public class Utl {
 				mainScriptName);
 
 		if (mainScriptName != null) {
-			result.add(mainScriptName);
+			result.add(new PackageScript(mainScriptName));
 		} else {
 			throw new ErrorException(
 					"Missing task parameter " + eventName);
@@ -197,7 +197,8 @@ public class Utl {
 				LOG.debug(M + "Required scripts: {} = {}",
 						requiredScriptParameterName,
 						requiredScriptParameterValue);
-				result.add(requiredScriptParameterValue);
+				result.add(new PackageScript(
+						requiredScriptParameterValue));
 			} else {
 				haveMoreParameters = false; // ======= exit on next iteration
 			}

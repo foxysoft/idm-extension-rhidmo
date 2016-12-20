@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import de.foxysoft.rhidmo.PackageScript;
 import de.foxysoft.rhidmo.Utl;
 import de.foxysoft.rhidmo.mock.Task;
 
@@ -39,13 +40,13 @@ public class TestUtlGetScriptNamesOfTask {
 	@Test
 	public void onlyMain() throws Exception {
 
-		List<String> exp = new ArrayList<String>(1);
-		exp.add(MAIN);
+		List<PackageScript> exp = new ArrayList<PackageScript>(1);
+		exp.add(new PackageScript(MAIN));
 
 		Task mockTask = Mockito.mock(Task.class);
 		Mockito.when(mockTask.getParameter(Matchers.eq(EVENT)))
 				.thenReturn(MAIN);
-		List<String> act = Utl.getScriptNamesOfTask(mockTask,
+		List<PackageScript> act = Utl.getScriptNamesOfTask(mockTask,
 				EVENT);
 		Assert.assertEquals(exp,
 				act);
@@ -53,9 +54,9 @@ public class TestUtlGetScriptNamesOfTask {
 
 	@Test
 	public void mainWithOneRequired() throws Exception {
-		List<String> exp = new ArrayList<String>(2);
-		exp.add(MAIN);
-		exp.add(REQ1_VALUE);
+		List<PackageScript> exp = new ArrayList<PackageScript>(2);
+		exp.add(new PackageScript(MAIN));
+		exp.add(new PackageScript(REQ1_VALUE));
 
 		Task mockTask = Mockito.mock(Task.class);
 		Mockito.when(mockTask.getParameter(Matchers.eq(EVENT)))
@@ -63,7 +64,7 @@ public class TestUtlGetScriptNamesOfTask {
 		Mockito.when(mockTask.getParameter(Matchers.eq(REQ1_KEY)))
 				.thenReturn(REQ1_VALUE);
 
-		List<String> act = Utl.getScriptNamesOfTask(mockTask,
+		List<PackageScript> act = Utl.getScriptNamesOfTask(mockTask,
 				EVENT);
 		Assert.assertEquals(exp,
 				act);
