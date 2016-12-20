@@ -13,8 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package de.foxysoft.rhidmo;
+package de.foxysoft.rhidmo.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Matchers;
@@ -22,7 +26,11 @@ import org.mockito.Mockito;
 import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
 
+import de.foxysoft.rhidmo.Utl;
+import de.foxysoft.rhidmo.mock.Task;
+
 public class TestUtl {
+
 	static class MockGlobalFunctions {
 		public static void someMethod(String s,
 				int i) {
@@ -50,4 +58,5 @@ public class TestUtl {
 									}
 								}));
 	}
+
 }
