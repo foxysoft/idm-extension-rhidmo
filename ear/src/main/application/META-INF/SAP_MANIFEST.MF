@@ -13,6 +13,9 @@ componentelement: <componentelement  name="rhidmo" vendor="de.foxysoft" componen
  C" subsystem="NO_SUBSYS" location="foxysoft" counter="${timestamp}" deltaversion=
  "F" updateversion="LB-${timestamp}" componentprovider="foxysoft" arc
  hivetype="DC"/> 
+dependencies: <dependency  Implementation-Title="tc/idm/jmx/app" Implementation-Vend
+ or-Id="sap.com" /> 
+dependencylist: <dependency  keyname="tc/idm/jmx/app" keyvendor="sap.com" /> 
 JarSL-Version: 20100616.1800
 compress: true
 
