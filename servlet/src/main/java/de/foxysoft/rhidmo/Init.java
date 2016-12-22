@@ -15,6 +15,9 @@
  ******************************************************************************/
 package de.foxysoft.rhidmo;
 
+import java.lang.reflect.Method;
+import java.util.Properties;
+
 import javax.naming.InitialContext;
 
 import org.mozilla.javascript.ContextFactory;
@@ -96,6 +99,30 @@ public class Init {
 					.initApplicationClassLoader(combinedClassLoader);
 			LOG.debug(M + "Rhino classloader initialized");
 			
+			// Get the application properties
+			Object appCfg = null;
+			try {
+				appCfg = ctx.lookup("ApplicationConfiguration");
+				if(appCfg == null) {
+					LOG.error(M + "Unable to read application configuration");
+				}
+				else
+				{
+					LOG.debug(M + "ApplicationConfiguration = {}", appCfg);
+				
+					Method getApplicationProperties = appCfg.getClass().getMethod("getApplicationProperties");
+					Properties props = (Properties) getApplicationProperties.invoke(appCfg);
+					if(props == null) {
+						LOG.error(M + "No application properties found");
+					}
+					
+					RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
+					myConf.setProperties(props);
+				}
+			}
+			catch(Exception e) {
+				LOG.error(e);
+			}
 			g_initialized = true;
 		} else {
 			LOG.debug(M + "Already initialized");
