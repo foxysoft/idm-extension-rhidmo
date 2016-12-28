@@ -75,9 +75,7 @@ public class PackageScript {
 	public boolean equals(Object o) {
 		if (o instanceof PackageScript) {
 			PackageScript other = (PackageScript) o;
-			return other.m_packageName == m_packageName
-					&& other.m_scriptName == m_scriptName
-					&& other.m_scriptSource == m_scriptSource;
+			return other.m_qualifiedName == m_qualifiedName;
 		} else {
 			return false;
 		}

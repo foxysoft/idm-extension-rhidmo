@@ -65,4 +65,14 @@ public class TestPackageScript {
 		} catch (ErrorException e) {
 		}
 	}
+
+	@Test
+	public void testHashcodeConsistentToEquals() throws Exception {
+		PackageScript one = new PackageScript(SCRIPT_NAME);
+		PackageScript two = new PackageScript(SCRIPT_NAME);
+		two.setScriptSource("DUMMY");
+		Assert.assertEquals(one.hashCode(),
+				two.hashCode());
+		Assert.assertTrue(one.equals(two));
+	}
 }
