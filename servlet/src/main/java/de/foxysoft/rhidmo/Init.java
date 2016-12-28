@@ -25,6 +25,7 @@ import org.mozilla.javascript.ContextFactory;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 
 public class Init {
 
@@ -123,10 +124,12 @@ public class Init {
 			catch(Exception e) {
 				LOG.error(e);
 			}
+
 			g_initialized = true;
 		} else {
 			LOG.debug(M + "Already initialized");
 		}
+		
 		LOG.debug(M + "Returning");
 	}
 

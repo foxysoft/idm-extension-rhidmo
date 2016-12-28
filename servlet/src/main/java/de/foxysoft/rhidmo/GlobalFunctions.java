@@ -17,7 +17,7 @@ package de.foxysoft.rhidmo;
 
 import java.io.File;
 import java.io.IOException;
-
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,11 +36,18 @@ import javax.xml.bind.DatatypeConverter;
 import javax.naming.InitialContext;
 
 import org.mozilla.javascript.Undefined;
+import org.mozilla.javascript.ScriptableObject;
 
 import org.ini4j.Ini;
 
-public class GlobalFunctions {
-	private GlobalFunctions() {
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.matcher.ElementMatchers;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+
+public class GlobalFunctions extends ScriptableObject {
+	public GlobalFunctions() {
 	}
 
 	private static final Log APPL_LOG = Log
@@ -242,6 +249,11 @@ public class GlobalFunctions {
 	public static String uEncrypt(String clearText, String algorithm, String key, String charEncoding) {
 		final String M = "uEncrypt: ";
 		LOG.debug(M + "Entering");
-		return null;
+		return "!ERROR: Not implemented yet";
+	}
+
+	@Override
+	public String getClassName() {
+		return getClass().getName();
 	}
 }

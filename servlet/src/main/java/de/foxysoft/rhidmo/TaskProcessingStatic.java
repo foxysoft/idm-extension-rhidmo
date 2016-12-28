@@ -24,6 +24,7 @@ import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.UniqueTag;
+import org.mozilla.javascript.ImporterTopLevel;
 
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
@@ -103,11 +104,15 @@ public class TaskProcessingStatic {
 			Utl.fetchScriptSource(packageScripts,
 					taskId);
 
-			Scriptable scope = context.initStandardObjects();
+			// Scriptable scope = context.initStandardObjects();
+			Scriptable scope = new ImporterTopLevel(Context.getCurrentContext());
 
-			Utl.registerPublicStaticMethodsInScope(
+			Scriptable gf = new GlobalFunctions();
+			gf.setParentScope(scope);
+
+			Utl.registerPublicMethodsInScope(
 					GlobalFunctions.class,
-					scope);
+					scope, gf);
 
 			Function f = Utl.execScriptsInScope(packageScripts,
 					scope,

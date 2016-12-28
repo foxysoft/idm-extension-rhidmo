@@ -17,6 +17,7 @@ package de.foxysoft.rhidmo;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Member;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -50,22 +51,22 @@ public class Utl {
 		return result;
 	}
 
-	public static void registerPublicStaticMethodsInScope(Class<?> c,
-			Scriptable scope) {
+	public static void registerPublicMethodsInScope(Class<?> c,
+			Scriptable parentScope, Scriptable scope) {
 		final String M = "registerGlobalFunctions: ";
 		Method[] methods = c.getMethods();
 		FunctionObject functionObject = null;
 		for (int i = 0; i < methods.length; ++i) {
 			int modifiers = methods[i].getModifiers();
 			if (Modifier.isPublic(modifiers)
-					&& Modifier.isStatic(modifiers)) {
+					&& (methods[i].getName().startsWith("u") || methods[i].getName().startsWith("rhidmo_"))) {
 
 				String methodName = methods[i].getName();
-				functionObject = new FunctionObject(methodName,
+				functionObject = new MyFunctionObject(methodName,
 						methods[i],
 						scope);
-				scope.put(methodName,
-						scope,
+				parentScope.put(methodName,
+						parentScope,
 						functionObject);
 				LOG.debug(M + "Registered {}",
 						methodName);
@@ -293,4 +294,15 @@ public class Utl {
 		return result;
 	}
 
+	private static class MyFunctionObject extends FunctionObject {
+		
+		private MyFunctionObject(String name, Member methodOrConstructor, Scriptable parentScope) {
+			super(name, methodOrConstructor, parentScope);
+		}
+		
+		@Override
+		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+			return super.call(cx, scope, getParentScope(), args);
+		}
+	}
 }

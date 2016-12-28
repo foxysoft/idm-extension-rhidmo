@@ -36,6 +36,7 @@ public class ServletContextListener
 			e.printStackTrace(pw);
 			LOG.error(M + "Exception occurred",
 					e);
+			LOG.error(e);
 		}
 		LOG.debug(M + "Exiting");
 	}

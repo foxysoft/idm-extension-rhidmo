@@ -25,26 +25,33 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 import de.foxysoft.rhidmo.Utl;
 import de.foxysoft.rhidmo.mock.Task;
 
 public class TestUtl {
 
-	static class MockGlobalFunctions {
-		public static void someMethod(String s,
+	class MockGlobalFunctions extends ScriptableObject {
+		public void rhidmo_someMethod(String s,
 				int i) {
 		}
+		
+		@Override
+		public String getClassName() {
+			return getClass().getName();
+		}	
 	}
 
 	@Test
 	public void testRegisterGlobalFunctions() throws Exception {
 		Scriptable mockScope = Mockito.mock(Scriptable.class);
-		Utl.registerPublicStaticMethodsInScope(
+		Scriptable mockGlobalFunctionScope = new MockGlobalFunctions();
+		Utl.registerPublicMethodsInScope(
 				MockGlobalFunctions.class,
-				mockScope);
+				mockScope, mockGlobalFunctionScope);
 		Mockito.verify(mockScope)
-				.put(Matchers.eq("someMethod"),
+				.put(Matchers.eq("rhidmo_someMethod"),
 						Matchers.eq(mockScope),
 						Matchers.argThat(
 								new ArgumentMatcher<FunctionObject>() {
@@ -53,7 +60,7 @@ public class TestUtl {
 											Object argument) {
 										FunctionObject fo = (FunctionObject) argument;
 										return fo.getFunctionName()
-												.equals("someMethod")
+												.equals("rhidmo_someMethod")
 												&& fo.getArity() == 2;
 									}
 								}));
