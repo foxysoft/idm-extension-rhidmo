@@ -15,10 +15,6 @@
  ******************************************************************************/
 package de.foxysoft.rhidmo.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Matchers;
@@ -28,11 +24,12 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import de.foxysoft.rhidmo.Utl;
-import de.foxysoft.rhidmo.mock.Task;
 
 public class TestUtl {
 
 	class MockGlobalFunctions extends ScriptableObject {
+		private final static long serialVersionUID = 1L;
+		
 		public void rhidmo_someMethod(String s,
 				int i) {
 		}

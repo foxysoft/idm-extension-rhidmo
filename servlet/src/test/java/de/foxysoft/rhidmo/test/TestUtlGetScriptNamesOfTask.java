@@ -22,8 +22,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import de.foxysoft.rhidmo.PackageScript;
 import de.foxysoft.rhidmo.Utl;
@@ -33,9 +31,7 @@ public class TestUtlGetScriptNamesOfTask {
 	private static final String MAIN = "MAIN_SCRIPT";
 	private static final String EVENT = "ONSUBMIT";
 	private static final String REQ1_KEY = "REQ1";
-	private static final String REQ2_KEY = "REQ2";
 	private static final String REQ1_VALUE = "FIRST_REQUIRED_SCRIPT";
-	private static final String REQ2_VALUE = "SECOND_REQUIRED_SCRIPT";
 
 	@Test
 	public void onlyMain() throws Exception {

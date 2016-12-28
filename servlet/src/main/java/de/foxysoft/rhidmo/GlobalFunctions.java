@@ -17,15 +17,12 @@ package de.foxysoft.rhidmo;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.security.AlgorithmParameters;
+import java.security.Key;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Properties;
-
-import java.security.AlgorithmParameters;
-import java.security.Key;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
@@ -33,20 +30,13 @@ import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.xml.bind.DatatypeConverter;
 
-import javax.naming.InitialContext;
-
-import org.mozilla.javascript.Undefined;
-import org.mozilla.javascript.ScriptableObject;
-
 import org.ini4j.Ini;
-
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.implementation.MethodDelegation;
-import net.bytebuddy.matcher.ElementMatchers;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
 
 public class GlobalFunctions extends ScriptableObject {
+	private static final long serialVersionUID = 1L;
+	
 	public GlobalFunctions() {
 	}
 

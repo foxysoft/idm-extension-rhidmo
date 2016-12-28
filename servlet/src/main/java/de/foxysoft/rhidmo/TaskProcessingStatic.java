@@ -20,11 +20,9 @@ import java.util.Locale;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
-import org.mozilla.javascript.JavaScriptException;
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.UniqueTag;
 import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.Scriptable;
 
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 

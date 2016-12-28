@@ -25,7 +25,6 @@ import org.mozilla.javascript.ContextFactory;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 
 public class Init {
 
