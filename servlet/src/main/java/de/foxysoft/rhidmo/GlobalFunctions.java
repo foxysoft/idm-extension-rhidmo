@@ -40,6 +40,7 @@ public class GlobalFunctions extends ScriptableObject {
 	public GlobalFunctions() {
 	}
 
+	static final String[][] algoTable = {{"DES3CBC", "DESede/CBC/PKCS5Padding", "DESede", "{DES3CBC}"}, {"", "", "", ""}};
 	private static final Log APPL_LOG = Log
 			.get("de.foxysoft.rhidmo.Application");
 
@@ -165,7 +166,6 @@ public class GlobalFunctions extends ScriptableObject {
 		}
 		
 		// Algorithm
-		final String[][] algoTable = {{"DES3CBC", "DESede/CBC/PKCS5Padding", "DESede"}, {"", "", ""}};
 		int algoStart = cipherText.indexOf("{"), algoEnd = cipherText.indexOf("}");
 		if(algoStart < 0 || algoEnd < 0) {
 			LOG.error(M + "No algorithm identifier found");
@@ -236,10 +236,61 @@ public class GlobalFunctions extends ScriptableObject {
 		return encodedClearText;
 	}
 	
-	public static String uEncrypt(String clearText, String algorithm, String key, String charEncoding) {
+	public static String uEncrypt(String clearText, String providedAlgorithm, String providedKey, String charEncoding) {
 		final String M = "uEncrypt: ";
 		LOG.debug(M + "Entering");
-		return "!ERROR: Not implemented yet";
+
+		RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
+		Properties props = myConf.getProperties();
+		if(props == null) {
+			LOG.error(M + "No properties found");
+			return "!ERROR: No properties found";
+		}
+			
+		String filename = props.getProperty("de.foxysoft.idm.crypt.keyfile");
+		LOG.debug(M + "Keys.ini = {}", filename);
+		
+		File keysIniFile = new File(filename);
+		if(!keysIniFile.exists()) {
+			LOG.error(M + "Keys.ini file {} does not exist", filename);
+			return "!ERROR: Keys.ini file not found";
+		}
+
+		Ini keysIni;
+		try {
+			keysIni = new Ini(keysIniFile);
+		}
+		catch(IOException e) {
+			LOG.error(e);
+			return "!ERROR: Unable to read keys.ini file";
+		}
+
+		String keyNumber = keysIni.get("CURRENT", "KEY"), algorithm = keysIni.get("ALGORITHMS", "ENCRYPTION");
+		LOG.debug(M + "KeyNumber, algorithm = {}", keyNumber, algorithm);
+		
+		int algorithmIndex = 0;
+		for(; algoTable[algorithmIndex][0].length() > 0; algorithmIndex++) {
+			if(algoTable[algorithmIndex][0].equalsIgnoreCase(algorithm))
+				break;
+		}
+		if(algoTable[algorithmIndex][0].length() == 0) {
+			return "!ERROR: Unknown algorithm [" + algorithm + "]";
+		}
+
+		try {
+			Cipher cp = Cipher.getInstance(algoTable[algorithmIndex][1]);
+			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(algoTable[algorithmIndex][2]);
+			byte[] currentKey = DatatypeConverter.parseHexBinary(keysIni.get("KEYS", keyNumber));
+			Key key = keyFactory.generateSecret(new DESedeKeySpec(currentKey));
+			cp.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
+			byte [] cipherText = cp.doFinal(clearText.getBytes());
+
+			return algoTable[algorithmIndex][3] + keyNumber.replaceFirst("^KEY0+(?!$)", "") + ":" + DatatypeConverter.printHexBinary(cp.getIV()).toLowerCase()
+					+ "-" + DatatypeConverter.printHexBinary(cipherText).toLowerCase();
+		} catch(Exception e) {
+			LOG.error(e);
+			return "!ERROR: Encryption problem";
+		}
 	}
 
 	@Override
