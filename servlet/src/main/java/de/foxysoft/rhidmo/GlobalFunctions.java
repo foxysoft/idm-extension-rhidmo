@@ -36,8 +36,14 @@ import org.mozilla.javascript.Undefined;
 
 public class GlobalFunctions extends ScriptableObject {
 	private static final long serialVersionUID = 1L;
-	
+
+	Object myTask;
+
 	public GlobalFunctions() {
+	}
+	
+	public GlobalFunctions(Object task) {
+		this.myTask = task;
 	}
 
 	static final String[][] algoTable = {{"DES3CBC", "DESede/CBC/PKCS5Padding", "DESede", "{DES3CBC}"}, {"", "", "", ""}};
@@ -136,7 +142,7 @@ public class GlobalFunctions extends ScriptableObject {
 		return result;
 	}
 
-	public static String uDecrypt(String cipherText, String providedKey, String charEncoding) {
+	public static String uDecrypt(String cipherText, String providedKey, Object charEncoding) {
 		final String M = "uDecrypt: ";
 		LOG.debug(M + "Entering Parameters = {}", cipherText, providedKey, charEncoding);
 
@@ -227,7 +233,7 @@ public class GlobalFunctions extends ScriptableObject {
 		
 		String encodedClearText;
 		try {
-			encodedClearText = new String(clearText, charEncoding);
+			encodedClearText = new String(clearText, (String) charEncoding);
 		}
 		catch(Exception e) {
 			LOG.error(e);
@@ -236,7 +242,7 @@ public class GlobalFunctions extends ScriptableObject {
 		return encodedClearText;
 	}
 	
-	public static String uEncrypt(String clearText, String providedAlgorithm, String providedKey, String charEncoding) {
+	public static String uEncrypt(String clearText, String providedAlgorithm, String providedKey, Object charEncoding) {
 		final String M = "uEncrypt: ";
 		LOG.debug(M + "Entering");
 
@@ -291,6 +297,143 @@ public class GlobalFunctions extends ScriptableObject {
 			LOG.error(e);
 			return "!ERROR: Encryption problem";
 		}
+	}
+	
+	public static String uIS_GetValue(int mskey, int idStore, String attrName) {
+		final String M = "uIS_GetValue: ";
+		LOG.debug(M + "Entering");
+
+		String ret = "";
+		ResultSet rs = null;
+		try {
+			Connection con = Utl.getConnection();
+			
+			// Figure out identity store from mskey if no identity store is given.
+			if(idStore == 0) {
+				PreparedStatement getIdStoreStatement = con.prepareStatement("Select max(is_id) from idmv_value_basic where mskey = ?");
+				getIdStoreStatement.setInt(1, mskey);
+				
+				rs = getIdStoreStatement.executeQuery();
+				if(rs.next()) {
+					idStore = rs.getInt(1);
+					LOG.debug(M + "Found identity store = {}", idStore);
+				}
+				else {
+					rs.close();
+					return "!ERROR: Unable to get identity store from mskey";
+				}
+				rs.close();
+			}
+
+			// Check if attribute exists and is a single value attribute
+			PreparedStatement getAttributeStatement = con.prepareStatement("select MultiValue, ReferenceObjectClass " +
+					" from MXI_Attributes where AttrName = ? and is_id = ? and multiValue = 0 and ReferenceObjectClass is null");
+			getAttributeStatement.setString(1, attrName);
+			getAttributeStatement.setInt(2, idStore);
+			rs = getAttributeStatement.executeQuery();
+			if(!rs.next()) {
+				rs.close();
+				return "!ERROR: Attribute does not exist in this identity store or is not a single value attribute";
+			}
+			else {
+				LOG.debug(M + "Attribute values = {}", rs.getInt(1), rs.getInt(2));
+			}
+			rs.close();
+			
+			// Read value from database (we always have an identity store)
+			String sqlStatement = "select avalue from idmv_value_basic where mskey = ? and attrname = ?  and is_id = ?";
+
+			PreparedStatement getValueStatement = con.prepareStatement(sqlStatement);
+			getValueStatement.setInt(1, mskey);
+			getValueStatement.setString(2, attrName);
+			getValueStatement.setInt(3, idStore);
+			rs = getValueStatement.executeQuery();
+			if(rs.next()) {
+					ret = rs.getString(1);
+			}
+			else {
+				return "!ERROR: No value found";
+			}
+		} catch(Exception e) {
+			LOG.error(e);
+			return "!ERROR: Executing SQL statement";
+		}
+		finally {
+			try { if(rs != null) rs.close(); } catch(Exception e) {}
+		}
+		
+		LOG.debug(M + "Returning = {}", ret);
+		return ret;
+	}
+
+	public int uGetIDStore() {
+		final String M = "uGetIDStore: ";
+		LOG.debug(M + "Entering");
+
+		ResultSet rs = null;
+		int idStore = 0;
+		try {
+			int taskId = ((Integer) this.myTask.getClass().getMethod("getID").invoke(this.myTask)).intValue();
+			LOG.debug(M + "Task ID = {}", taskId);
+			
+			String sqlStatement = "SELECT IDStore FROM MXP_Tasks where TaskID = ?";
+			Connection con = Utl.getConnection();
+			PreparedStatement getValueStatement = con.prepareStatement(sqlStatement);
+			getValueStatement.setInt(1, taskId);
+			rs = getValueStatement.executeQuery();
+			if(rs.next()) {
+				idStore = rs.getInt(1);
+			}
+		} catch(Exception e) {
+			LOG.error(e);
+			return 0;
+		}
+		finally {
+			try { if(rs != null) rs.close(); } catch(Exception e) {}
+		}
+		
+		LOG.debug(M + "Returning ID Store = {}", idStore);
+		return idStore;
+	}
+
+	public static String uIS_nGetValues(int mskey, String attrName, Object separator) {
+		final String M = "uIS_nGetValues: ";
+		LOG.debug(M + "Entering = {}", mskey, attrName, separator);
+
+		String separator2Use = "";
+		if (separator == null
+				|| Undefined.instance == separator
+				|| "".equals(separator)) {
+			separator2Use = "!!";
+			LOG.debug(M + "Setting separator");
+		} else {
+			separator2Use = (String) separator;
+		}
+		
+		ResultSet rs = null;
+		String ret = "";
+		try {
+			Connection con = Utl.getConnection();
+			PreparedStatement getValuesStatement = con.prepareStatement("select avalue from idmv_value_basic where mskey = ? and attrname = ?");
+			getValuesStatement.setInt(1, mskey);
+			getValuesStatement.setString(2, attrName);
+			rs = getValuesStatement.executeQuery();
+			while(rs.next()) {
+				if(ret != "") {
+					ret += separator2Use;
+				}
+				ret += rs.getString(1);
+			}
+		} catch(Exception e) {
+			LOG.error(e);
+			return "!ERROR: Unable to execute sql statement";
+		}
+		finally {
+			try { if(rs != null) rs.close(); } catch(Exception e) {}
+		}
+
+		LOG.debug(M + "Returning = {}", ret);
+		return ret;
 	}
 
 	@Override

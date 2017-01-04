@@ -105,7 +105,7 @@ public class TaskProcessingStatic {
 			// Scriptable scope = context.initStandardObjects();
 			Scriptable scope = new ImporterTopLevel(Context.getCurrentContext());
 
-			Scriptable gf = new GlobalFunctions();
+			Scriptable gf = new GlobalFunctions(task);
 			gf.setParentScope(scope);
 
 			Utl.registerPublicMethodsInScope(

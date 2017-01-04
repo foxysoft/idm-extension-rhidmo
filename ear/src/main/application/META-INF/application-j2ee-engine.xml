@@ -19,4 +19,5 @@
 <reference-target provider-name="sap.com" target-type="application">tc/idm/jmx/app</reference-target>
 </reference>
 <provider-name>de.foxysoft</provider-name>
+<start-up mode="always"/>
 </application-j2ee-engine>
