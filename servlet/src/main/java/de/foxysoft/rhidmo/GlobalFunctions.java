@@ -16,7 +16,6 @@
 package de.foxysoft.rhidmo;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.AlgorithmParameters;
 import java.security.Key;
 import java.sql.Connection;
@@ -30,7 +29,6 @@ import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.xml.bind.DatatypeConverter;
 
-import org.ini4j.Ini;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
@@ -38,15 +36,33 @@ public class GlobalFunctions extends ScriptableObject {
 	private static final long serialVersionUID = 1L;
 
 	Object myTask;
+	RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
+	KeyStorageProvider myKeyStorage;
 
 	public GlobalFunctions() {
+		this(null);
 	}
 	
 	public GlobalFunctions(Object task) {
 		this.myTask = task;
+		
+		final String M = "Constructor: ";
+		Properties props = myConf.getProperties();
+		if(props == null) {
+			LOG.error(M + "No properties found");
+			return;
+		}
+
+		String filename = props.getProperty("de.foxysoft.idm.crypt.keyfile");
+		LOG.debug(M + "Keys.ini = {}", filename);
+
+		myKeyStorage = new IniKeyStorageProvider(new File(filename));
+	}
+	
+	public GlobalFunctions(KeyStorageProvider myKeyStorageProvider) {
+		this.myKeyStorage = myKeyStorageProvider;
 	}
 
-	static final String[][] algoTable = {{"DES3CBC", "DESede/CBC/PKCS5Padding", "DESede", "{DES3CBC}"}, {"", "", "", ""}};
 	private static final Log APPL_LOG = Log
 			.get("de.foxysoft.rhidmo.Application");
 
@@ -142,34 +158,9 @@ public class GlobalFunctions extends ScriptableObject {
 		return result;
 	}
 
-	public static String uDecrypt(String cipherText, String providedKey, Object charEncoding) {
+	public String uDecrypt(String cipherText, String providedKey, Object charEncoding) {
 		final String M = "uDecrypt: ";
 		LOG.debug(M + "Entering Parameters = {}", cipherText, providedKey, charEncoding);
-
-		RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
-		Properties props = myConf.getProperties();
-		if(props == null) {
-			LOG.error(M + "No properties found");
-			return "!ERROR: No properties found";
-		}
-			
-		String filename = props.getProperty("de.foxysoft.idm.crypt.keyfile");
-		LOG.debug(M + "Keys.ini = {}", filename);
-		
-		File keysIniFile = new File(filename);
-		if(!keysIniFile.exists()) {
-			LOG.error(M + "Keys.ini file {} does not exist", filename);
-			return "!ERROR: Keys.ini file not found";
-		}
-
-		Ini keysIni;
-		try {
-			keysIni = new Ini(keysIniFile);
-		}
-		catch(IOException e) {
-			LOG.error(e);
-			return "!ERROR: Unable to read keys.ini file";
-		}
 		
 		// Algorithm
 		int algoStart = cipherText.indexOf("{"), algoEnd = cipherText.indexOf("}");
@@ -178,16 +169,7 @@ public class GlobalFunctions extends ScriptableObject {
 			return "!ERROR: No algorithm identifier found";
 		}
 		String algorithm = cipherText.substring(algoStart + 1, algoEnd);
-		int algorithmIndex = 0;
-		for(; algoTable[algorithmIndex][0].length() > 0; algorithmIndex++) {
-			if(algoTable[algorithmIndex][0].equalsIgnoreCase(algorithm))
-				break;
-		}		
-		if(algoTable[algorithmIndex][0].length() == 0) {
-			LOG.error(M + "Unknown algorithm = {}", algorithm);
-			return "!ERROR: Unknown algorithm";
-		}
-		LOG.debug(M + "Algorithm = {}", algoTable[algorithmIndex][1], algoTable[algorithmIndex][2]);
+		this.myKeyStorage.setAlgorithmName(algorithm);
 
 		// Key
 		int keyIndexEnd = cipherText.indexOf(":");
@@ -196,9 +178,9 @@ public class GlobalFunctions extends ScriptableObject {
 			return "!ERROR: No key index end found";
 		}
 		String keyIndex = cipherText.substring(algoEnd + 1, keyIndexEnd);
-		keyIndex = "KEY" + "000000".substring(0, 3 - keyIndex.length()) + keyIndex;
-		String key = keysIni.get("KEYS", keyIndex);
-		
+		this.myKeyStorage.setKeyIndex(keyIndex);
+		byte[] key = this.myKeyStorage.getKey();
+
 		// Initialization Vector
 		int ivEnd = cipherText.indexOf("-");
 		if(ivEnd < 0) {
@@ -209,12 +191,12 @@ public class GlobalFunctions extends ScriptableObject {
 
 		byte[] clearText = null;
 		try {
-			Cipher cp = Cipher.getInstance(algoTable[algorithmIndex][1]);
-			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(algoTable[algorithmIndex][2]);
-			DESedeKeySpec spec = new DESedeKeySpec(DatatypeConverter.parseHexBinary(key));
+			Cipher cp = Cipher.getInstance(this.myKeyStorage.getCipherName());
+			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(this.myKeyStorage.getSecretKeyName());
+			DESedeKeySpec spec = new DESedeKeySpec(key);
 			Key cipherKey = keyFactory.generateSecret(spec);
 
-			AlgorithmParameters algParams = AlgorithmParameters.getInstance(algoTable[algorithmIndex][2]);
+			AlgorithmParameters algParams = AlgorithmParameters.getInstance(this.myKeyStorage.getSecretKeyName());
 			algParams.init(new IvParameterSpec(DatatypeConverter.parseHexBinary(initializationVector)));
 
 			cp.init(javax.crypto.Cipher.DECRYPT_MODE, cipherKey, algParams);
@@ -242,56 +224,18 @@ public class GlobalFunctions extends ScriptableObject {
 		return encodedClearText;
 	}
 	
-	public static String uEncrypt(String clearText, String providedAlgorithm, String providedKey, Object charEncoding) {
+	public String uEncrypt(String clearText, String providedAlgorithm, String providedKey, Object charEncoding) {
 		final String M = "uEncrypt: ";
 		LOG.debug(M + "Entering");
-
-		RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
-		Properties props = myConf.getProperties();
-		if(props == null) {
-			LOG.error(M + "No properties found");
-			return "!ERROR: No properties found";
-		}
-			
-		String filename = props.getProperty("de.foxysoft.idm.crypt.keyfile");
-		LOG.debug(M + "Keys.ini = {}", filename);
 		
-		File keysIniFile = new File(filename);
-		if(!keysIniFile.exists()) {
-			LOG.error(M + "Keys.ini file {} does not exist", filename);
-			return "!ERROR: Keys.ini file not found";
-		}
-
-		Ini keysIni;
 		try {
-			keysIni = new Ini(keysIniFile);
-		}
-		catch(IOException e) {
-			LOG.error(e);
-			return "!ERROR: Unable to read keys.ini file";
-		}
-
-		String keyNumber = keysIni.get("CURRENT", "KEY"), algorithm = keysIni.get("ALGORITHMS", "ENCRYPTION");
-		LOG.debug(M + "KeyNumber, algorithm = {}", keyNumber, algorithm);
-		
-		int algorithmIndex = 0;
-		for(; algoTable[algorithmIndex][0].length() > 0; algorithmIndex++) {
-			if(algoTable[algorithmIndex][0].equalsIgnoreCase(algorithm))
-				break;
-		}
-		if(algoTable[algorithmIndex][0].length() == 0) {
-			return "!ERROR: Unknown algorithm [" + algorithm + "]";
-		}
-
-		try {
-			Cipher cp = Cipher.getInstance(algoTable[algorithmIndex][1]);
-			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(algoTable[algorithmIndex][2]);
-			byte[] currentKey = DatatypeConverter.parseHexBinary(keysIni.get("KEYS", keyNumber));
-			Key key = keyFactory.generateSecret(new DESedeKeySpec(currentKey));
+			Cipher cp = Cipher.getInstance(this.myKeyStorage.getDefaultCipherName());
+			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(this.myKeyStorage.getDefaultSecretKeyName());
+			Key key = keyFactory.generateSecret(new DESedeKeySpec(this.myKeyStorage.getCurrentKey()));
 			cp.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
-			byte [] cipherText = cp.doFinal(clearText.getBytes());
+			byte[] cipherText = cp.doFinal(clearText.getBytes());
 
-			return algoTable[algorithmIndex][3] + keyNumber.replaceFirst("^KEY0+(?!$)", "") + ":" + DatatypeConverter.printHexBinary(cp.getIV()).toLowerCase()
+			return this.myKeyStorage.getDefaultAlgorithmDescription() + this.myKeyStorage.getCurrentKeyDescription() + ":" + DatatypeConverter.printHexBinary(cp.getIV()).toLowerCase()
 					+ "-" + DatatypeConverter.printHexBinary(cipherText).toLowerCase();
 		} catch(Exception e) {
 			LOG.error(e);
