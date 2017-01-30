@@ -1,57 +1,64 @@
 <!--
-  Copyright 2017 Lambert Boskamp
-  
-  Licensed under the Apache License, Version 2.0 (the "License"); you may not
-  use this file except in compliance with the License.  You may obtain a copy
-  of the License at
-  
-    http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-  License for the specific language governing permissions and limitations under
-  the License.
+    Copyright 2017 Lambert Boskamp
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License.  You may obtain a copy
+of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+License for the specific language governing permissions and limitations under
+the License.
 -->
 <project>
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.foxysoft.idm</groupId>
-	<artifactId>rhidmo-ear</artifactId>
-	<packaging>ear</packaging>
-	<version>1.0</version>
-	<name>rhidmo-ear</name>
-	<!-- Must wrap maven.build.timestamp into user property -->
-	<!-- for successful use in resource filtering. -->
-	<!-- See https://stackoverflow.com/questions/13228472 -->
-	<!-- This property is used in SAP_MANIFEST.MF as counter, -->
-	<!-- which basically represents the SDA version number. -->
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<timestamp>${maven.build.timestamp}</timestamp>
-		<maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>de.foxysoft.idm</groupId>
-			<artifactId>rhidmo-servlet</artifactId>
-			<type>war</type>
-			<version>1.0</version>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-ear-plugin</artifactId>
-				<version>2.10.1</version>
-				<configuration>
-					<filtering>true</filtering>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.foxysoft.idm</groupId>
+  <artifactId>rhidmo-ear</artifactId>
+  <packaging>ear</packaging>
+  <version>1.0</version>
+  <name>rhidmo-ear</name>
+  <!-- Must wrap maven.build.timestamp into user property -->
+  <!-- for successful use in resource filtering. -->
+  <!-- See https://stackoverflow.com/questions/13228472 -->
+  <!-- This property is used in SAP_MANIFEST.MF as counter, -->
+  <!-- which basically represents the SDA version number. -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>de.foxysoft.idm</groupId>
+      <artifactId>rhidmo-servlet</artifactId>
+      <type>war</type>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-ear-plugin</artifactId>
+        <version>2.10.1</version>
+        <configuration>
+          <modules>
+            <webModule>
+              <groupId>de.foxysoft.idm</groupId>
+              <artifactId>rhidmo-servlet</artifactId>
+              <contextRoot>/rhidmo</contextRoot>
+            </webModule>
+          </modules>
+          <filtering>true</filtering>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
