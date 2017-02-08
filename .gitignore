@@ -1,1 +1,7 @@
-**/target/
+.project
+.settings
+.classpath
+mk
+bin
+target
+
