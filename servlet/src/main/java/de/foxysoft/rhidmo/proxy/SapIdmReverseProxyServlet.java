@@ -17,17 +17,24 @@
 package de.foxysoft.rhidmo.proxy;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.AbortableHttpRequest;
 import org.apache.http.message.BasicHttpRequest;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 import de.foxysoft.rhidmo.Log;
 
@@ -44,7 +51,7 @@ public class SapIdmReverseProxyServlet
 	 * @param servletRequest
 	 * @param proxyRequest
 	 */
-	protected void _setXForwardedForHeader(
+	private void _setXForwardedForHeader(
 			HttpServletRequest servletRequest,
 			HttpRequest proxyRequest) {
 		if (doForwardIP) {
@@ -79,6 +86,7 @@ public class SapIdmReverseProxyServlet
 	protected void service(HttpServletRequest servletRequest,
 			HttpServletResponse servletResponse)
 			throws ServletException, IOException {
+		final String M = "service: ";
 		// initialize request attributes from caches if unset by a subclass by
 		// this point
 		if (servletRequest.getAttribute(ATTR_TARGET_URI) == null) {
@@ -134,14 +142,22 @@ public class SapIdmReverseProxyServlet
 
 			// BEGIN: Modification for SapIdmReverseProxyServlet
 			boolean isXmlOrJsonResponse = false;
+			String contentType = "";
 			Header contentTypeHeader = proxyResponse
 					.getFirstHeader("Content-Type");
 			if (contentTypeHeader != null) {
-				String contentType = contentTypeHeader.getValue()
+				contentType = contentTypeHeader.getValue()
 						.toLowerCase();
+
+				LOG.debug(M + "Proxy response Content-Type: {}",
+						contentType);
+
 				isXmlOrJsonResponse = contentType
 						.startsWith("application/json")
 						|| contentType.startsWith("application/xml");
+			} else {
+				LOG.warn(M
+						+ "Missing Content-Type header in proxy response");
 			}
 			if (statusCode == HttpServletResponse.SC_INTERNAL_SERVER_ERROR
 					&& isXmlOrJsonResponse) {
@@ -171,14 +187,20 @@ public class SapIdmReverseProxyServlet
 				servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH,
 						0);
 			} else {
-				// Send the content to the client
-				copyResponseEntity(proxyResponse,
+				// BEGIN: Modification for SapIdmReverseProxyServlet
+				// Send transformed content to the client
+				transformResponseEntity(proxyResponse,
 						servletResponse,
 						proxyRequest,
-						servletRequest);
+						servletRequest,
+						contentType);
 			}
 
 		} catch (Exception e) {
+			// BEGIN: Modification for SapIdmReverseProxyServlet
+			LOG.error(e);
+			// END: Modification for SapIdmReverseProxyServlet
+
 			// abort request, according to best practice with HttpClient
 			if (proxyRequest instanceof AbortableHttpRequest) {
 				AbortableHttpRequest abortableHttpRequest = (AbortableHttpRequest) proxyRequest;
@@ -213,6 +235,118 @@ public class SapIdmReverseProxyServlet
 			Throwable t) {
 		LOG.error(m);
 		LOG.error(t);
+	}
+
+	/**
+	 * Copy response body data (the entity) from the proxy to the servlet
+	 * client.
+	 */
+	private void transformResponseEntity(HttpResponse proxyResponse,
+			HttpServletResponse servletResponse,
+			HttpRequest proxyRequest,
+			HttpServletRequest servletRequest,
+			String contentType) throws Exception {
+		HttpEntity entity = proxyResponse.getEntity();
+		if (entity != null) {
+			if (contentType.startsWith("application/json")) {
+				transformResponseEntityJson(entity,
+						servletResponse,
+						proxyRequest,
+						servletRequest);
+			} else if (contentType.startsWith("application/xml")) {
+				transformResponseEntityXml(entity,
+						servletResponse,
+						proxyRequest,
+						servletRequest);
+			} else {
+				transformResponseEntityOther(entity,
+						servletResponse,
+						proxyRequest,
+						servletRequest);
+			}
+		}
+	}
+
+	/**
+	 * Extracts JSON property error.message.value from proxyResponseEntity's
+	 * input stream and writes the result to servletResponse's output stream.
+	 * 
+	 * @param proxyResponseEntity
+	 * @param servletResponse
+	 * @param proxyRequest
+	 * @param servletRequest
+	 * @throws IOException
+	 */
+	private void transformResponseEntityJson(
+			HttpEntity proxyResponseEntity,
+			HttpServletResponse servletResponse,
+			HttpRequest proxyRequest,
+			HttpServletRequest servletRequest) throws Exception {
+		// TODO: replace with custom JSON handling
+		transformResponseEntityOther(proxyResponseEntity,
+				servletResponse,
+				proxyRequest,
+				servletRequest);
+	}
+
+	/**
+	 * Extracts XML element error/message from proxyResponseEntity's input
+	 * stream and writes the result to servletResponse's output stream.
+	 * 
+	 * @param proxyResponseEntity
+	 * @param servletResponse
+	 * @param proxyRequest
+	 * @param servletRequest
+	 * @throws IOException
+	 */
+	private void transformResponseEntityXml(
+			HttpEntity proxyResponseEntity,
+			HttpServletResponse servletResponse,
+			HttpRequest proxyRequest,
+			HttpServletRequest servletRequest) throws Exception {
+
+		final String M = "transformResponseEntityXml: ";
+		ServletOutputStream servletResponseOutputStream = servletResponse
+				.getOutputStream();
+		XmlResponseHandler handler = new XmlResponseHandler(
+				servletResponseOutputStream);
+
+		long start = System.currentTimeMillis();
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		spf.setNamespaceAware(true);
+		SAXParser saxParser = spf.newSAXParser();
+		XMLReader xmlReader = saxParser.getXMLReader();
+		xmlReader.setContentHandler(handler);
+		xmlReader.parse(
+				new InputSource(proxyResponseEntity.getContent()));
+		servletResponse.setContentLength(handler.getContentLength());
+		handler.flush();
+
+		long end = System.currentTimeMillis();
+		LOG.debug(M + "XML transformation took {} millis",
+				(end - start));
+		LOG.debug(M + "handler={}",
+				handler);
+	}
+
+	/**
+	 * Copies all data from proxyResponseEntity's input stream without
+	 * modification to servletResponse's output stream.
+	 * 
+	 * @param proxyResponseEntity
+	 * @param servletResponse
+	 * @param proxyRequest
+	 * @param servletRequest
+	 * @throws IOException
+	 */
+	private void transformResponseEntityOther(
+			HttpEntity proxyResponseEntity,
+			HttpServletResponse servletResponse,
+			HttpRequest proxyRequest,
+			HttpServletRequest servletRequest) throws Exception {
+		OutputStream servletOutputStream = servletResponse
+				.getOutputStream();
+		proxyResponseEntity.writeTo(servletOutputStream);
 	}
 
 }
