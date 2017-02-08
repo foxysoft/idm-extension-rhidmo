@@ -238,6 +238,22 @@ public class SapIdmReverseProxyServlet
 	}
 
 	/**
+	 * Filter out "server" response header, as this seems to be implicitly added
+	 * by SAP NetWeaver AS Java to every request, even it such a header already
+	 * exists.
+	 */
+	@Override
+	protected void copyResponseHeader(HttpServletRequest servletRequest,
+			HttpServletResponse servletResponse,
+			Header header) {
+		if (false == "server".equals(header.getName())) {
+			super.copyResponseHeader(servletRequest,
+					servletResponse,
+					header);
+		}
+	}
+
+	/**
 	 * Copy response body data (the entity) from the proxy to the servlet
 	 * client.
 	 */
