@@ -59,7 +59,7 @@ public class Utl {
 		for (int i = 0; i < methods.length; ++i) {
 			int modifiers = methods[i].getModifiers();
 			if (Modifier.isPublic(modifiers)
-					&& (methods[i].getName().startsWith("u") || methods[i].getName().startsWith("rhidmo_"))) {
+					&& (methods[i].getName().startsWith("u") || methods[i].getName().startsWith("rhidmo"))) {
 
 				String methodName = methods[i].getName();
 				functionObject = new MyFunctionObject(methodName,
