@@ -18,6 +18,7 @@ package de.foxysoft.rhidmo.proxy;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -35,6 +36,10 @@ import org.apache.http.client.methods.AbortableHttpRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 import de.foxysoft.rhidmo.Log;
 
@@ -298,11 +303,29 @@ public class SapIdmReverseProxyServlet
 			HttpServletResponse servletResponse,
 			HttpRequest proxyRequest,
 			HttpServletRequest servletRequest) throws Exception {
-		// TODO: replace with custom JSON handling
-		transformResponseEntityOther(proxyResponseEntity,
-				servletResponse,
-				proxyRequest,
-				servletRequest);
+		String M = "transformResponseEntityJson: ";
+
+		JsonFactory jf = new JsonFactory();
+		JsonParser jp = jf
+				.createParser(proxyResponseEntity.getContent());
+
+		boolean inValue = false;
+		Writer w = servletResponse.getWriter();
+		while (jp.nextToken() != JsonToken.END_OBJECT) {
+			if (inValue) {
+				jp.getText(w);
+				LOG.debug(M + "Consuming value text");
+			} else {
+				String fieldName = jp.getCurrentName();
+				inValue = "value".equals(fieldName);
+
+				LOG.debug(M + "fieldName={}, inValue={}",
+						fieldName,
+						inValue);
+			}
+		} // while
+		jp.close();
+		w.flush();
 	}
 
 	/**
