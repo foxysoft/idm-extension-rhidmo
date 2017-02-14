@@ -14,23 +14,32 @@
   the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.foxysoft.idm</groupId>
-  <version>1.0</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <artifactId>rhidmo</artifactId>
-  <name>rhidmo</name>
   <modules>
     <module>servlet</module>
     <module>ear</module>
   </modules>
+  <!-- Must wrap maven.build.timestamp into user property -->
+  <!-- for successful use in resource filtering. -->
+  <!-- See https://stackoverflow.com/questions/13228472 -->
+  <!-- This property is used in SAP_MANIFEST.MF as counter, -->
+  <!-- which basically represents the SDA version number. -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>de.foxysoft.idm</groupId>
         <artifactId>rhidmo-servlet</artifactId>
-        <version>1.0</version>
+        <version>1.0.0-SNAPSHOT</version>
         <type>war</type>
       </dependency>
     </dependencies>
