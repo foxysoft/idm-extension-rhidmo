@@ -21,9 +21,7 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.foxysoft.idm</groupId>
   <artifactId>rhidmo-ear</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
   <packaging>ear</packaging>
   <dependencies>
     <dependency>
