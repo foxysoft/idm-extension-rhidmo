@@ -199,3 +199,37 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+   RHIDMO SUBCOMPONENTS
+
+   Rhidmo contains a number of subcomponents with
+   separate copyright notices and license terms. Your use of the source
+   code for these subcomponents is subject to the terms and
+   conditions of the following licenses.
+
+   This product bundles Byte Buddy 1.6.14, copyright Rafael Winterhalter,
+   which is available under an Apache License 2.0.
+
+   This product bundles ASM 5.1, copyright INRIA, France Telecom,
+   which is available under a BSD license.
+   For details, see licenses/asm.BSD.txt.
+
+   This product bundles SLF4J API 1.7.25, copyright QOS.ch,
+   which is available under an MIT license.
+   For details, see licenses/slf4j-api.MIT.txt.
+
+   This product bundles SLF4J bridge to SAP's logging implementation 1.1,
+   copyright MuleSoft, Inc., which is available under a
+   Common Public Attribution License Version 1.0 (CPAL).
+   For details, see licenses/slf4j-sap-logging.CPAL.txt.
+
+   This product bundles Rhino 1.7R4, copyright The Mozilla Foundation,
+   which is available under a Mozilla Public License Version 2.0.
+   For details, see licenses/rhino.MPL.txt
+
+   This product bundles Apache Commons Codec 1.10 copyright The Apache
+   Software Foundation, which is available under an Apache License 2.0.
+
+   This product bundles ini4j 0.5.4, copyright Ivan SZKIBA,
+   which is available under an Apache License 2.0.
+

@@ -1,0 +1,12 @@
+Rhidmo(R)
+Copyright 2017 Lambert Boskamp & Sietze Roorda
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+------------------------------------------------------------------------
+The following NOTICEs pertain to software bundled with this product.
+------------------------------------------------------------------------
+
+ini4j
+Copyright 2005,2009 Ivan SZKIBA

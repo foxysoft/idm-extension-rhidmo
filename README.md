@@ -14,7 +14,9 @@ You need [Git](https://git-scm.com/), Java6+ and [Maven 3.x](https://maven.apach
      mvn package
      
 ## Deploy
-The easiest way to deploy is to copy rhidmo-ear-&lt;VERSION&gt;.ear to your SAP&reg; NetWeaver host, and use a local telnet connection to deploy.
+For a detailed installation and configuration guide, please refer to docs/InstallationManual.pdf contained in this distribution. Here's a condensed summary:
+
+Copy rhidmo-ear-&lt;VERSION&gt;.ear to your SAP&reg; NetWeaver host, and use a local telnet connection to deploy.
 
 Assuming UNIX-like build environment (local) and SAP&reg; NetWeaver host (remote), use these shell commands to deploy directly from the project's root directory:
 

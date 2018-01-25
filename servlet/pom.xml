@@ -44,7 +44,7 @@
     </repository>
   </repositories>
   <dependencies>
-    <!-- PRODUCTION DEPENDENCIES rhidmo-js -->
+    <!-- BEGIN: PRODUCTION DEPENDENCIES -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -78,7 +78,13 @@
       <artifactId>commons-codec</artifactId>
       <version>1.10</version>
     </dependency>
-    <!-- UNIT TEST DEPENDENCIES -->
+    <dependency>
+      <groupId>org.ini4j</groupId>
+      <artifactId>ini4j</artifactId>
+      <version>0.5.4</version>
+    </dependency>
+    <!-- END: PRODUCTION DEPENDENCIES -->
+    <!-- BEGIN: UNIT TEST DEPENDENCIES -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
@@ -98,11 +104,7 @@
       <version>1.7.25</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.ini4j</groupId>
-      <artifactId>ini4j</artifactId>
-      <version>0.5.4</version>
-    </dependency>
+    <!-- END: UNIT TEST DEPENDENCIES -->
   </dependencies>
   <build>
     <plugins>
