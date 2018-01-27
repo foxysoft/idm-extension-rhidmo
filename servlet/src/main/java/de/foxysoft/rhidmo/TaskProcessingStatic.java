@@ -23,6 +23,7 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.Undefined;
 
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
@@ -130,8 +131,9 @@ public class TaskProcessingStatic {
 						new Object[] { locale, subjectMSKEY,
 								objectMSKEY, task, data });
 
-				result = (Object[]) Context.jsToJava(resultJS,
-						Object[].class);
+				if(resultJS != null && Undefined.instance != resultJS) {
+					result = (Object[]) Context.jsToJava(resultJS, Object[].class);
+				}
 
 			} // End INNER try
 			catch (JavaScriptException jse) {

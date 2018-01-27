@@ -17,10 +17,13 @@ package de.foxysoft.rhidmo;
 
 import java.util.Properties;
 
+import javax.mail.Session;
+
 public class RhidmoConfiguration {
 
 	static RhidmoConfiguration myConfiguration = null;
 	Properties myProperties;
+	Session myEmailSession;
 
 	public static synchronized RhidmoConfiguration getInstance() {
 		if(myConfiguration == null) {
@@ -35,5 +38,13 @@ public class RhidmoConfiguration {
 	
 	public Properties getProperties() {
 		return this.myProperties;
+	}
+
+	public void setEmailSession(Session mailSession) {
+		this.myEmailSession = mailSession;
+	}
+	
+	public Session getEmailSession() {
+		return this.myEmailSession;
 	}
 }

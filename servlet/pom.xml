@@ -105,6 +105,11 @@
       <scope>test</scope>
     </dependency>
     <!-- END: UNIT TEST DEPENDENCIES -->
+    <dependency>
+    	<groupId>javax.mail</groupId>
+    	<artifactId>javax.mail-api</artifactId>
+    	<version>1.6.0</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

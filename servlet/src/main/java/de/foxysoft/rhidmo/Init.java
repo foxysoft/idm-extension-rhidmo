@@ -18,6 +18,8 @@ package de.foxysoft.rhidmo;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import javax.naming.InitialContext;
 
 import org.mozilla.javascript.ContextFactory;
@@ -100,6 +102,7 @@ public class Init {
 			LOG.debug(M + "Rhino classloader initialized");
 			
 			// Get the application properties
+			RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
 			Object appCfg = null;
 			try {
 				appCfg = ctx.lookup("ApplicationConfiguration");
@@ -116,9 +119,12 @@ public class Init {
 						LOG.error(M + "No application properties found");
 					}
 					
-					RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
 					myConf.setProperties(props);
 				}
+				
+				// Get the mail session object in case we need to send email
+				Session mailSession = (Session) ctx.lookup("java:comp/env/mail/MailSession");
+				myConf.setEmailSession(mailSession);
 			}
 			catch(Exception e) {
 				LOG.error(e);

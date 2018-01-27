@@ -16,9 +16,7 @@
 package de.foxysoft.rhidmo;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.FileInputStream;
 import java.nio.charset.Charset;
 import java.security.AlgorithmParameters;
 import java.security.Key;
@@ -31,17 +29,18 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.IvParameterSpec;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMessage.RecipientType;
+import javax.mail.internet.MimeMultipart;
 import javax.xml.bind.DatatypeConverter;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
-import org.xml.sax.InputSource;
 
 public class GlobalFunctions extends ScriptableObject {
 	private static final long serialVersionUID = 1L;
@@ -498,6 +497,98 @@ public class GlobalFunctions extends ScriptableObject {
 		LOG.debug(M + "Returning = {}",
 				ret);
 		return ret;
+	}
+
+	public String uSendSMTPMessage(String sender, String recipients, String subject,
+			String messageOrFilename, String smtpHost, Object contentType, Object port,
+			Object attachment, Object attachmentType) {
+		final String M = "uSendSMTPMessage: ";
+		LOG.debug(M + "Entering = {}", sender, recipients, subject, messageOrFilename, smtpHost,
+				contentType, port, attachment, attachmentType);
+
+		if (contentType == null || Undefined.instance == contentType
+				|| "".equals(contentType)) {
+			contentType = "text/plain;";
+			LOG.debug(M + "Using default content type = {}", contentType);
+		}
+
+		// Parse recipients to see if there are more than one.
+		String[] recipientList = null;
+		if(recipients.indexOf(';') >= 0 ) {
+			recipientList = recipients.split(";");
+		}
+		else {
+			if(recipients.indexOf(",") >= 0) {
+				recipientList = recipients.split(",");
+			}
+		}
+
+		Session mailSession = myConf.getEmailSession();
+		
+		try {
+			MimeMessage emailMessage = new MimeMessage(mailSession);
+			MimeBodyPart bodyPart;
+			
+			// Check if the message is in reality a file
+			File inputFile = new File(messageOrFilename);
+			if(inputFile.exists()) {
+				bodyPart = new MimeBodyPart(new FileInputStream(inputFile));
+			}
+			else {
+				// Must be the body itself
+				bodyPart = new MimeBodyPart();
+				bodyPart.setContent(messageOrFilename, (String) contentType);
+			}
+			Multipart multipart = new MimeMultipart();
+			multipart.addBodyPart(bodyPart);
+			
+			// Check for attachment
+			if(Undefined.instance != attachment) {
+				MimeBodyPart attachmentBodypart = new MimeBodyPart();
+				attachmentBodypart.attachFile((String) attachment);
+				attachmentBodypart.setFileName(new File((String) attachment).getName());
+				
+				multipart.addBodyPart(attachmentBodypart);
+				if(Undefined.instance != attachmentType) {
+					attachmentBodypart.setHeader("Content-Type", (String) attachmentType);
+				}
+			}
+			emailMessage.setContent(multipart);
+			emailMessage.setSubject(subject);
+
+			if(recipientList == null) {
+				if(recipients.startsWith("cc:")) {
+					emailMessage.setRecipients(RecipientType.CC, recipients.substring(3));
+				} else if(recipients.startsWith("bcc:")) {
+					emailMessage.setRecipients(RecipientType.BCC, recipients.substring(4));
+				} else
+					emailMessage.setRecipients(RecipientType.TO, recipients);
+			}
+			else
+			{
+				for(int i = 0; i < recipientList.length; i++) {
+					if(recipientList[i].startsWith("cc:")) {
+						emailMessage.addRecipients(RecipientType.CC, recipientList[i].substring(3));
+					} else if(recipientList[i].startsWith("bcc:")) {
+						emailMessage.addRecipients(RecipientType.BCC, recipientList[i].substring(4));
+					}
+					else
+						emailMessage.addRecipients(RecipientType.TO, recipientList[i]);
+				}
+			}
+			
+			// Set sender
+			InternetAddress[] fromAddress = new InternetAddress[] {new InternetAddress(sender)};
+			emailMessage.addFrom(fromAddress);
+			
+			Transport.send(emailMessage);
+		} catch (Exception e) {
+			LOG.error(e);
+			return "!ERROR: Got exception";
+		}
+		
+		LOG.debug(M + "Returning");
+		return "";
 	}
 
 	@Override
