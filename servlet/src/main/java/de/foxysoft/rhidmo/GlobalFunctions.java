@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Lambert Boskamp
+ * Copyright 2017, 2018 Lambert Boskamp & Sietze Roorda
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -19,16 +19,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.Charset;
 import java.security.AlgorithmParameters;
-import java.security.Key;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.Properties;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -212,6 +214,20 @@ public class GlobalFunctions extends ScriptableObject {
 
 	}
 
+	private static SecretKey determineSecretKey(byte[] binaryKey, String keyType, int keySize) throws Exception {
+		final String M = "determineSecretKey: ";
+
+		LOG.debug(M + "Keysize = {}, AES Maximum {}", keySize, Cipher.getMaxAllowedKeyLength("AES") / 8);
+		if(keyType == "AES") {
+			return new SecretKeySpec(Arrays.copyOf(binaryKey, keySize), "AES");
+		}
+		else {
+			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(keyType);
+			DESedeKeySpec spec = new DESedeKeySpec(binaryKey);
+			return keyFactory.generateSecret(spec);
+		}
+	}
+	
 	public String uDecrypt(String cipherText,
 			String providedKey,
 			Object charEncoding) {
@@ -257,19 +273,14 @@ public class GlobalFunctions extends ScriptableObject {
 		try {
 			Cipher cp = Cipher
 					.getInstance(this.myKeyStorage.getCipherName());
-			SecretKeyFactory keyFactory = SecretKeyFactory
-					.getInstance(this.myKeyStorage.getSecretKeyName());
-			DESedeKeySpec spec = new DESedeKeySpec(key);
-			Key cipherKey = keyFactory.generateSecret(spec);
+			SecretKey cipherKey = determineSecretKey(key, this.myKeyStorage.getSecretKeyName(), this.myKeyStorage.getCurrentKeySize());
 
 			AlgorithmParameters algParams = AlgorithmParameters
 					.getInstance(this.myKeyStorage.getSecretKeyName());
 			algParams.init(new IvParameterSpec(DatatypeConverter
 					.parseHexBinary(initializationVector)));
 
-			cp.init(javax.crypto.Cipher.DECRYPT_MODE,
-					cipherKey,
-					algParams);
+			cp.init(javax.crypto.Cipher.DECRYPT_MODE, cipherKey, algParams);
 			clearText = cp.doFinal(DatatypeConverter
 					.parseHexBinary(cipherText.substring(ivEnd + 1)));
 		} catch (Exception e) {
@@ -299,20 +310,22 @@ public class GlobalFunctions extends ScriptableObject {
 			String providedKey,
 			Object charEncoding) {
 		final String M = "uEncrypt: ";
-		LOG.debug(M + "Entering");
+		LOG.debug(M + "Entering. Algorithm = {}, charEncoding = {}", providedAlgorithm, charEncoding);
 
 		try {
-			Cipher cp = Cipher.getInstance(
-					this.myKeyStorage.getDefaultCipherName());
-			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(
-					this.myKeyStorage.getDefaultSecretKeyName());
-			Key key = keyFactory.generateSecret(new DESedeKeySpec(
-					this.myKeyStorage.getCurrentKey()));
-			cp.init(javax.crypto.Cipher.ENCRYPT_MODE,
-					key);
+			if(providedAlgorithm instanceof String && providedAlgorithm != null && ! "".equals(providedAlgorithm)) {
+				this.myKeyStorage.setAlgorithmName(providedAlgorithm);
+				LOG.debug(M + "Using algorithm = {}", providedAlgorithm);
+			}
+			
+			String cipherName = this.myKeyStorage.getCipherName();
+			LOG.debug(M + "Using cipher = {}", cipherName);
+			Cipher cp = Cipher.getInstance(cipherName);
+			SecretKey key = determineSecretKey(this.myKeyStorage.getCurrentKey(), this.myKeyStorage.getSecretKeyName(), this.myKeyStorage.getCurrentKeySize());
+			cp.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
 			byte[] cipherText = cp.doFinal(clearText.getBytes());
 
-			return this.myKeyStorage.getDefaultAlgorithmDescription()
+			return this.myKeyStorage.getAlgorithmDescription()
 					+ this.myKeyStorage.getCurrentKeyDescription() + ":"
 					+ DatatypeConverter.printHexBinary(cp.getIV())
 							.toLowerCase()

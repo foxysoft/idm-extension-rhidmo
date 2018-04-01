@@ -16,8 +16,13 @@
 package de.foxysoft.rhidmo;
 
 public interface KeyStorageProvider {
-	static final String[][] algoTable = {{"DES3CBC", "DESede/CBC/PKCS5Padding", "DESede", "{DES3CBC}"}, {"", "", "", ""}};
-	int index = 0;
+	static final String[][] algoTable = {
+			{"DES3CBC", "DESede/CBC/PKCS5Padding", "DESede", "{DES3CBC}", "0"},
+			{"AES128CBC", "AES/CBC/PKCS5Padding", "AES", "{AES128CBC}", "16"},
+			{"AES192CBC", "AES/CBC/PKCS5Padding", "AES", "{AES192CBC}", "24"},
+			{"AES256CBC", "AES/CBC/PKCS5Padding", "AES", "{AES256CBC}", "32"},
+			{"", "", "", "", "0"}
+			};
 
 	void setAlgorithmName(String algorithm);
 
@@ -31,6 +36,8 @@ public interface KeyStorageProvider {
 	
 	byte[] getCurrentKey();
 	
+	String getAlgorithmDescription();
+	
 	String getDefaultCipherName();
 	
 	String getDefaultSecretKeyName();
@@ -38,4 +45,6 @@ public interface KeyStorageProvider {
 	String getDefaultAlgorithmDescription();
 	
 	String getCurrentKeyDescription();
+	
+	int getCurrentKeySize();
 }

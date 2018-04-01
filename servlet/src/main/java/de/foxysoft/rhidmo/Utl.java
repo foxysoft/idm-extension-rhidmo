@@ -158,7 +158,7 @@ public class Utl {
 					}
 					sb.append('?');
 				}
-				sb.append(')');
+				sb.append(") and a.mcEnabled = 1 and a.mcIsObsoleted = 0 and a.mcScriptLanguage = 'JScript'");
 				String sql = sb.toString();
 				LOG.debug(M + "sql = {}",
 						sql);

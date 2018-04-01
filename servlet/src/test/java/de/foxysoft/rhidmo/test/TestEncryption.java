@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Sietze Roorda
+ * Copyright 2017, 2018 Sietze Roorda
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -23,30 +23,57 @@ import de.foxysoft.rhidmo.mock.InMemoryStorageProvider;
 public class TestEncryption {
 
 	@Test
-	public void doTestEncryption() throws Exception {
-		this.doTestEncryptionCharsetEncoding("");
+	public void doTestEncryptionDefaults() throws Exception {
+		this.doTestEncryptionCharsetEncoding("", "");
 	}
 	
 	@Test
-	public void doTestEncryption2() throws Exception {
-		this.doTestEncryptionCharsetEncoding("UTF8");
+	public void doTestEncryptionUTF8() throws Exception {
+		this.doTestEncryptionCharsetEncoding("UTF8", "AES256CBC");
 	}
 
 	@Test
-	public void doTestEncryption3() throws Exception {
-		this.doTestEncryptionCharsetEncoding("Cp1252");
+	public void doTestEncryptionCp1252() throws Exception {
+		this.doTestEncryptionCharsetEncoding("Cp1252", "AES256CBC");
 	}
 
-	public void doTestEncryptionCharsetEncoding(String charsetEncoding) throws Exception {
+	@Test
+	public void doTestEncryptionAES128() throws Exception {
+		this.doTestEncryptionCharsetEncoding("", "AES128CBC");
+	}
+
+	@Test
+	public void doTestEncryptionAES192() throws Exception {
+		this.doTestEncryptionCharsetEncoding("", "AES192CBC");
+	}
+
+	@Test
+	public void doTestEncryptionAES256() throws Exception {
+		this.doTestEncryptionCharsetEncoding("", "AES256CBC");
+	}
+
+	public void doTestEncryptionCharsetEncoding(String charsetEncoding, String algorithm) throws Exception {
 		InMemoryStorageProvider myKeyStorage = new InMemoryStorageProvider();
 		GlobalFunctions gf = new GlobalFunctions(myKeyStorage);
 
 		String clearText = charsetEncoding + "VeryDeviousSecret01%$!";
-		String cipherText = gf.uEncrypt(clearText, "", "", charsetEncoding);
-		String clearText2 = gf.uDecrypt(cipherText, "", charsetEncoding);
+		String cipherText = gf.uEncrypt(clearText, algorithm, "", charsetEncoding);
 
+		// Check algorithm
+		if("".equals(algorithm)) {
+			if(!cipherText.startsWith(myKeyStorage.getDefaultAlgorithmDescription())) {
+				throw new Exception("Wrong default algorithm used for encryption");
+			}
+		}
+		else {
+			if(!cipherText.startsWith("{" + algorithm + "}")) {
+				throw new Exception("Wrong algorithm used for encryption");
+			}
+		}
+
+		String clearText2 = gf.uDecrypt(cipherText, algorithm, charsetEncoding);
 		if(!clearText.equals(clearText2)) {
 			throw new Exception("No match");
-		}
+		}		
 	}
 }

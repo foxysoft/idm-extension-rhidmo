@@ -17,35 +17,22 @@ package de.foxysoft.rhidmo.mock;
 
 import javax.xml.bind.DatatypeConverter;
 
+import de.foxysoft.rhidmo.IniKeyStorageProvider;
 import de.foxysoft.rhidmo.KeyStorageProvider;
 
-public class InMemoryStorageProvider implements KeyStorageProvider {
+public class InMemoryStorageProvider extends IniKeyStorageProvider implements KeyStorageProvider {
 
-	private String algorithmName, keyIndex;
-
-	@Override
-	public void setAlgorithmName(String algorithm) {
-		this.algorithmName = algorithm;
+	public InMemoryStorageProvider() {
+		super(null);
 	}
-
+	
 	@Override
 	public void setKeyIndex(String keyIndex) {
-		this.keyIndex = keyIndex;
 	}
 
 	@Override
 	public byte[] getKey() {
 		return DatatypeConverter.parseHexBinary("33787F51D0659F770DEAA3EA74ADAE1265E624937D08BB17");
-	}
-
-	@Override
-	public String getCipherName() {
-		return "DESede/CBC/PKCS5Padding";
-	}
-
-	@Override
-	public String getSecretKeyName() {
-		return "DESede";
 	}
 
 	@Override
@@ -55,22 +42,21 @@ public class InMemoryStorageProvider implements KeyStorageProvider {
 
 	@Override
 	public String getDefaultCipherName() {
-		return this.getCipherName();
+		return "DESede/CBC/PKCS5Padding";
 	}
 
 	@Override
 	public String getDefaultSecretKeyName() {
-		return this.getSecretKeyName();
-	}
-
-	@Override
-	public String getDefaultAlgorithmDescription() {
-		return "{DES3CBC}";
+		return "DESede";
 	}
 
 	@Override
 	public String getCurrentKeyDescription() {
 		return "1";
 	}
-
+	
+	@Override
+	public String getDefaultAlgorithmDescription() {
+		return "{DES3CBC}";
+	}
 }
