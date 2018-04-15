@@ -15,6 +15,8 @@
  ******************************************************************************/
 package de.foxysoft.rhidmo.test;
 
+import javax.crypto.Cipher;
+
 import org.junit.Test;
 
 import de.foxysoft.rhidmo.GlobalFunctions;
@@ -53,6 +55,12 @@ public class TestEncryption {
 	}
 
 	public void doTestEncryptionCharsetEncoding(String charsetEncoding, String algorithm) throws Exception {
+		int maxAllowedKeySize = Cipher.getMaxAllowedKeyLength("AES");
+		if (maxAllowedKeySize == 128 && (algorithm == "AES192CBC" || algorithm == "AES256CBC")) {
+			System.out.println("Install unlimited crypto policy files. Max size = [" + maxAllowedKeySize + "]");
+			return;
+		}
+
 		InMemoryStorageProvider myKeyStorage = new InMemoryStorageProvider();
 		GlobalFunctions gf = new GlobalFunctions(myKeyStorage);
 
