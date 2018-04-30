@@ -15,19 +15,43 @@
  ******************************************************************************/
 package de.foxysoft.rhidmo;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.util.Properties;
 
 import javax.mail.Session;
 
 public class RhidmoConfiguration {
+	private static final Log LOG = Log.get(RhidmoConfiguration.class);
 
 	static RhidmoConfiguration myConfiguration = null;
 	Properties myProperties;
 	Session myEmailSession;
+	boolean isObsoletedColumnAvailable = false;
+	
+	private RhidmoConfiguration () {
+		final String M = "Constructor: ";
+
+		// Check if column mcIsObsoleted is there or not.
+		try {
+			Connection conn = Utl.getConnection();
+			DatabaseMetaData md = conn.getMetaData();
+			ResultSet rs = md.getColumns(null,  null,  "mc_package_scripts", "mcIsObsoleted");
+			if(rs.next()) {
+				this.isObsoletedColumnAvailable = true;
+				LOG.debug(M + "Column mcIsobsoleted is available in table mc_package_scripts");
+			}
+		}
+		catch(Exception e) {
+			LOG.error(M + "Getting database meta data");
+			LOG.error(e);
+		}
+	}
 
 	public static synchronized RhidmoConfiguration getInstance() {
 		if(myConfiguration == null) {
-			myConfiguration = new RhidmoConfiguration();
+			myConfiguration = new RhidmoConfiguration();			
 		}
 		return myConfiguration;		
 	}
@@ -46,5 +70,9 @@ public class RhidmoConfiguration {
 	
 	public Session getEmailSession() {
 		return this.myEmailSession;
+	}
+	
+	public boolean getIsObsoletedColumnAvailable() throws Exception {
+		return isObsoletedColumnAvailable;
 	}
 }
