@@ -1,5 +1,5 @@
 # Rhidmo&reg;
-Developing JavaScript-based extensions for [SAP&reg; Identity Management (IDM) 8.0](http://go.sap.com/product/technology-platform/identity-management.html)
+Developing JavaScript-based extensions for [SAP&reg; Identity Management (IDM) 8.0](https://www.sap.com/products/identity-management.html)
 
 ## What is it?
 Rhidmo&reg; is a generic implementation of the SAP&reg; Identity Management Extension Framework. It enables developers to build custom SAP&reg; IDM extensions in JavaScript instead of Java, directly from SAP&reg; Identity Management Developer Studio.
