@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017, 2018 Lambert Boskamp & Sietze Roorda
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -43,6 +43,8 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
+
+import de.foxysoft.rhidmo.IDMHash.HashConfiguration;
 
 public class GlobalFunctions extends ScriptableObject {
 	private static final long serialVersionUID = 1L;
@@ -227,7 +229,7 @@ public class GlobalFunctions extends ScriptableObject {
 			return keyFactory.generateSecret(spec);
 		}
 	}
-	
+
 	public String uDecrypt(String cipherText,
 			String providedKey,
 			Object charEncoding) {
@@ -317,7 +319,7 @@ public class GlobalFunctions extends ScriptableObject {
 				this.myKeyStorage.setAlgorithmName(providedAlgorithm);
 				LOG.debug(M + "Using algorithm = {}", providedAlgorithm);
 			}
-			
+
 			String cipherName = this.myKeyStorage.getCipherName();
 			LOG.debug(M + "Using cipher = {}", cipherName);
 			Cipher cp = Cipher.getInstance(cipherName);
@@ -537,11 +539,11 @@ public class GlobalFunctions extends ScriptableObject {
 		}
 
 		Session mailSession = myConf.getEmailSession();
-		
+
 		try {
 			MimeMessage emailMessage = new MimeMessage(mailSession);
 			MimeBodyPart bodyPart;
-			
+
 			// Check if the message is in reality a file
 			File inputFile = new File(messageOrFilename);
 			if(inputFile.exists()) {
@@ -554,13 +556,13 @@ public class GlobalFunctions extends ScriptableObject {
 			}
 			Multipart multipart = new MimeMultipart();
 			multipart.addBodyPart(bodyPart);
-			
+
 			// Check for attachment
 			if(Undefined.instance != attachment) {
 				MimeBodyPart attachmentBodypart = new MimeBodyPart();
 				attachmentBodypart.attachFile((String) attachment);
 				attachmentBodypart.setFileName(new File((String) attachment).getName());
-				
+
 				multipart.addBodyPart(attachmentBodypart);
 				if(Undefined.instance != attachmentType) {
 					attachmentBodypart.setHeader("Content-Type", (String) attachmentType);
@@ -589,19 +591,81 @@ public class GlobalFunctions extends ScriptableObject {
 						emailMessage.addRecipients(RecipientType.TO, recipientList[i]);
 				}
 			}
-			
+
 			// Set sender
 			InternetAddress[] fromAddress = new InternetAddress[] {new InternetAddress(sender)};
 			emailMessage.addFrom(fromAddress);
-			
+
 			Transport.send(emailMessage);
 		} catch (Exception e) {
 			LOG.error(e);
 			return "!ERROR: Got exception";
 		}
-		
+
 		LOG.debug(M + "Returning");
 		return "";
+	}
+
+	// OutString=uGenHash(String Value[, StringAlgorithm[, String CharacterEncoding]]);
+	public static String uGenHash(String value, Object algorithm, Object characterEncoding) {
+		final String M = "uGenHash: ";
+
+		String algorithm2Use = "";
+		if (algorithm == null || Undefined.instance == algorithm || "".equals(algorithm)) {
+			algorithm2Use = "PBKDF2_SHA1"; // Must be gotten from Keys.ini file.
+			LOG.debug(M + "Reading algorithm from keys.ini file");
+		} else {
+			algorithm2Use = (String) algorithm;
+		}
+
+		String encoding2Use = "";
+		if (characterEncoding == null || Undefined.instance == characterEncoding || "".equals(characterEncoding)) {
+			encoding2Use = null;
+			LOG.debug(M + "Setting character encoding");
+		} else {
+			encoding2Use = (String) characterEncoding;
+		}
+
+		String hash = null;
+
+		try {
+			HashConfiguration hc = HashConfiguration.valueOf(algorithm2Use);
+			hash = hc.generateHash(value, encoding2Use);
+		} catch(Exception e) {
+			LOG.error(e);
+			return "!ERROR: Unable to generate hash";
+		}
+		return hash;
+	}
+
+	// OutString=uCompareHash(StringClearTextValue, String CompareHashedValue[, StringCharacterEncoding]);
+	public static boolean uCompareHash(String clearText, String hashValue, Object characterEncoding) {
+		final String M = "uCompareHash: ";
+		String encoding2Use = "";
+		if (characterEncoding == null || Undefined.instance == characterEncoding || "".equals(characterEncoding)) {
+			encoding2Use = null;
+			LOG.debug(M + "Setting character encoding");
+		} else {
+			encoding2Use = (String) characterEncoding;
+		}
+
+		try {
+			HashConfiguration hc = HashConfiguration.getHashConfiguration(hashValue);
+			return hc.compareHash(clearText, hashValue, encoding2Use);
+		} catch(Exception e) {
+			LOG.error(e);
+			return false;
+		}
+	}
+
+	// OutString=uMD5(String InString[, StringCharacterEncoding]);
+	public static String uMD5(String clearText, Object characterEncoding) {
+		return uGenHash(clearText, "MD5", characterEncoding).toLowerCase();
+	}
+
+	// OutString=uSHA1(String Input[, StringCharacterEncoding]);
+	public static String uSHA1(String clearText, Object characterEncoding) {
+		return uGenHash(clearText, "SHA", characterEncoding);
 	}
 
 	@Override

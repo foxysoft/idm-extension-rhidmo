@@ -19,7 +19,6 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 
 import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import javax.naming.InitialContext;
 
 import org.mozilla.javascript.ContextFactory;

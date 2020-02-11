@@ -51,7 +51,7 @@ public class RhidmoConfiguration {
 
 	public static synchronized RhidmoConfiguration getInstance() {
 		if(myConfiguration == null) {
-			myConfiguration = new RhidmoConfiguration();			
+			myConfiguration = new RhidmoConfiguration();
 		}
 		return myConfiguration;		
 	}
