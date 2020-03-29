@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 Sietze Roorda
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -60,7 +60,7 @@ public class IniKeyStorageProvider implements KeyStorageProvider {
 			LOG.error(M + "Unknown algorithm = {}", algorithm);
 			return;
 		}
-		LOG.debug(M + "Algorithm = {} {} {}, Index = {}", 
+		LOG.debug(M + "Algorithm = {} {} {}, Index = {}",
 				algoTable[this.algorithmIndex][1], algoTable[this.algorithmIndex][2], algoTable[this.algorithmIndex][4],
 				this.algorithmIndex);
 	}
@@ -102,7 +102,7 @@ public class IniKeyStorageProvider implements KeyStorageProvider {
 	public String getDefaultCipherName() {
 		final String M = "getDefaultCipherName: ";
 		String algorithm = this.keysIni.get("ALGORITHMS", "ENCRYPTION");
-		
+
 		int defaultIndex = 0;
 		for(; algoTable[defaultIndex][0].length() > 0; defaultIndex++) {
 			if(algoTable[defaultIndex][0].equalsIgnoreCase(algorithm))
@@ -120,7 +120,7 @@ public class IniKeyStorageProvider implements KeyStorageProvider {
 	public String getDefaultSecretKeyName() {
 		final String M = "getDefaultSecretKeyName: ";
 		String algorithm = this.keysIni.get("ALGORITHMS", "ENCRYPTION");
-		
+
 		int defaultIndex = 0;
 		for(; algoTable[defaultIndex][0].length() > 0; defaultIndex++) {
 			if(algoTable[defaultIndex][0].equalsIgnoreCase(algorithm))
@@ -138,7 +138,7 @@ public class IniKeyStorageProvider implements KeyStorageProvider {
 	public String getDefaultAlgorithmDescription() {
 		final String M = "getDefaultAlgorithmDescription: ";
 		String algorithm = this.keysIni.get("ALGORITHMS", "ENCRYPTION");
-		
+
 		int defaultIndex = 0;
 		for(; algoTable[defaultIndex][0].length() > 0; defaultIndex++) {
 			if(algoTable[defaultIndex][0].equalsIgnoreCase(algorithm))
@@ -157,7 +157,8 @@ public class IniKeyStorageProvider implements KeyStorageProvider {
 		String keyNumber = keysIni.get("CURRENT", "KEY");
 		return keyNumber.replaceFirst("^KEY0+(?!$)", "");
 	}
-	
+
+	@Override
 	public int getCurrentKeySize() {
 		if(this.algorithmIndex == -1) {
 			return 0;
@@ -174,5 +175,24 @@ public class IniKeyStorageProvider implements KeyStorageProvider {
 			return this.getDefaultAlgorithmDescription();
 		}
 		return algoTable[this.algorithmIndex][3];
+	}
+
+	@Override
+	public String getDefaultHashName() {
+		final String M = "getDefaultHashName: ";
+
+		if(this.keysIni == null) {
+			LOG.error(M + "No keys.ini available");
+			return null;
+		}
+
+		String defaultHash = keysIni.get("ALGORITHMS", "HASH");
+		if(defaultHash == null || defaultHash == "") {
+			defaultHash = "PBKDF2_SHA1";
+			LOG.debug(M + "Setting default hash name (not from keys.ini)");
+		}
+
+		LOG.debug(M + "Default Hash algorithm = {}", defaultHash);
+		return defaultHash;
 	}
 }

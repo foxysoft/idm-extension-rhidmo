@@ -76,6 +76,8 @@ public class GlobalFunctions extends ScriptableObject {
 	}
 
 	public GlobalFunctions(KeyStorageProvider myKeyStorageProvider) {
+		final String M = "Constructor (ks): ";
+		LOG.debug(M + "Setting my keystorage provider");
 		this.myKeyStorage = myKeyStorageProvider;
 	}
 
@@ -90,6 +92,24 @@ public class GlobalFunctions extends ScriptableObject {
 
 	public static void uError(String m) {
 		APPL_LOG.error(m);
+	}
+
+	public void uErrMsg(int type, String message) {
+		final String M = "uErrMsg: ";
+
+		switch (type) {
+		case 0:
+			APPL_LOG.debug(message);
+			break;
+		case 1:
+			APPL_LOG.warn(message);
+			break;
+		case 2:
+			APPL_LOG.error(message);
+			break;
+		default:
+			LOG.error(M + "!ERROR: Unknown error level = {}", type);
+		}
 	}
 
 	public static String uSelect(String sqlStatement,
@@ -607,13 +627,17 @@ public class GlobalFunctions extends ScriptableObject {
 	}
 
 	// OutString=uGenHash(String Value[, StringAlgorithm[, String CharacterEncoding]]);
-	public static String uGenHash(String value, Object algorithm, Object characterEncoding) {
+	public String uGenHash(String value, Object algorithm, Object characterEncoding) {
 		final String M = "uGenHash: ";
 
 		String algorithm2Use = "";
 		if (algorithm == null || Undefined.instance == algorithm || "".equals(algorithm)) {
-			algorithm2Use = "PBKDF2_SHA1"; // Must be gotten from Keys.ini file.
 			LOG.debug(M + "Reading algorithm from keys.ini file");
+			algorithm2Use = this.myKeyStorage.getDefaultHashName();
+			if(algorithm2Use == null) {
+				LOG.error(M + "Unable to get default hash algorithm (forgotten to specify keys.ini?)");
+				return "!ERROR: Unable to generate hash";
+			}
 		} else {
 			algorithm2Use = (String) algorithm;
 		}
@@ -639,7 +663,7 @@ public class GlobalFunctions extends ScriptableObject {
 	}
 
 	// OutString=uCompareHash(StringClearTextValue, String CompareHashedValue[, StringCharacterEncoding]);
-	public static boolean uCompareHash(String clearText, String hashValue, Object characterEncoding) {
+	public boolean uCompareHash(String clearText, String hashValue, Object characterEncoding) {
 		final String M = "uCompareHash: ";
 		String encoding2Use = "";
 		if (characterEncoding == null || Undefined.instance == characterEncoding || "".equals(characterEncoding)) {
@@ -651,6 +675,10 @@ public class GlobalFunctions extends ScriptableObject {
 
 		try {
 			HashConfiguration hc = HashConfiguration.getHashConfiguration(hashValue);
+			if(hc == null) {
+				LOG.error("!ERROR: Cannot determine hash algorithm = {}", hashValue);
+				return false;
+			}
 			return hc.compareHash(clearText, hashValue, encoding2Use);
 		} catch(Exception e) {
 			LOG.error(e);
@@ -659,12 +687,12 @@ public class GlobalFunctions extends ScriptableObject {
 	}
 
 	// OutString=uMD5(String InString[, StringCharacterEncoding]);
-	public static String uMD5(String clearText, Object characterEncoding) {
+	public String uMD5(String clearText, Object characterEncoding) {
 		return uGenHash(clearText, "MD5", characterEncoding).toLowerCase();
 	}
 
 	// OutString=uSHA1(String Input[, StringCharacterEncoding]);
-	public static String uSHA1(String clearText, Object characterEncoding) {
+	public String uSHA1(String clearText, Object characterEncoding) {
 		return uGenHash(clearText, "SHA", characterEncoding);
 	}
 

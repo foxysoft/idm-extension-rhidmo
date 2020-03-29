@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 Lambert Boskamp
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -159,7 +159,7 @@ public class Utl {
 					sb.append('?');
 				}
 				sb.append(") and a.mcEnabled = 1 and a.mcScriptLanguage = 'JScript'");
-				
+
 				RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
 				if(myConf.getIsObsoletedColumnAvailable()) {
 					sb.append(" and a.mcIsObsoleted = 0");
@@ -300,11 +300,12 @@ public class Utl {
 	}
 
 	private static class MyFunctionObject extends FunctionObject {
-		
+		private static final long serialVersionUID = 1L;
+
 		private MyFunctionObject(String name, Member methodOrConstructor, Scriptable parentScope) {
 			super(name, methodOrConstructor, parentScope);
 		}
-		
+
 		@Override
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			return super.call(cx, scope, getParentScope(), args);
