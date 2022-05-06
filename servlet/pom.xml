@@ -28,7 +28,7 @@
       <id>central</id>
       <name>Maven Repository Switchboard</name>
       <layout>default</layout>
-      <url>http://repo1.maven.org/maven2</url>
+      <url>https://repo1.maven.org/maven2</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -37,7 +37,7 @@
       <id>mulesoft</id>
       <name>Mulesoft Releases Repository</name>
       <layout>default</layout>
-      <url>http://repository.mulesoft.org/releases/</url>
+      <url>https://repository.mulesoft.org/releases/</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
