@@ -24,7 +24,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.Properties;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -40,26 +39,43 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMessage.RecipientType;
 import javax.mail.internet.MimeMultipart;
 import javax.xml.bind.DatatypeConverter;
-
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
 public class GlobalFunctions extends ScriptableObject {
 	private static final long serialVersionUID = 1L;
 
-	Object myTask;
-	RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
-	KeyStorageProvider myKeyStorage;
+	protected Object myTask;
+	protected KeyStorageProvider myKeyStorage;
+	protected RhidmoConfiguration myConfiguration;
+	protected Utl myUtl;
 
-	public GlobalFunctions() {
-		this(null);
+	/**
+	 * Disallow creation without task or key storage - no use case
+	 */
+	@SuppressWarnings("unused")
+	private GlobalFunctions() {
 	}
 
-	public GlobalFunctions(Object task) {
+	/**
+	 * Create a new GlobalFunctions instance from task and configuration.
+	 * This constructor will create a file-based IniKeyStorageProvider
+	 * from the value of property de.foxysoft.idm.crypt.keyfile
+	 * contained in configuration.getProperties().
+	 * 
+	 * References to both task and props will be held throughout the
+	 * lifetime of this GlobalFunctions object.
+	 * 
+	 * @param task Task object 
+	 * @param configuration Rhidmo configuration
+	 */
+	public GlobalFunctions(Object task, RhidmoConfiguration configuration, Utl utl) {
 		this.myTask = task;
-
+		this.myConfiguration = configuration;
+		this.myUtl = utl;
+		
 		final String M = "Constructor: ";
-		Properties props = myConf.getProperties();
+		Properties props = configuration.getProperties();
 		if (props == null) {
 			LOG.error(M + "No properties found");
 			return;
@@ -82,15 +98,15 @@ public class GlobalFunctions extends ScriptableObject {
 
 	private static final Log LOG = Log.get(GlobalFunctions.class);
 
-	public static void uWarning(String m) {
+	public void uWarning(String m) {
 		APPL_LOG.warn(m);
 	}
 
-	public static void uError(String m) {
+	public void uError(String m) {
 		APPL_LOG.error(m);
 	}
 
-	public static String uSelect(String sqlStatement,
+	public String uSelect(String sqlStatement,
 			Object rowSeparator,
 			Object columnSeparator) {
 		final String M = "uSelect: ";
@@ -121,7 +137,7 @@ public class GlobalFunctions extends ScriptableObject {
 		PreparedStatement ps = null;
 
 		try {
-			c = Utl.getConnection();
+			c = myUtl.getConnection();
 			ps = c.prepareStatement(sqlStatement);
 			rs = ps.executeQuery();
 
@@ -172,7 +188,7 @@ public class GlobalFunctions extends ScriptableObject {
 		return result;
 	}
 
-	public static String uFromHex(String hexString,
+	public String uFromHex(String hexString,
 			String characterEncoding) {
 		final String M = "uFromHex: ";
 		LOG.debug(M + "Entering hexString={}, characterEncoding={}",
@@ -214,7 +230,7 @@ public class GlobalFunctions extends ScriptableObject {
 
 	}
 
-	private static SecretKey determineSecretKey(byte[] binaryKey, String keyType, int keySize) throws Exception {
+	private SecretKey determineSecretKey(byte[] binaryKey, String keyType, int keySize) throws Exception {
 		final String M = "determineSecretKey: ";
 
 		LOG.debug(M + "Keysize = {}, AES Maximum {}", keySize, Cipher.getMaxAllowedKeyLength("AES") / 8);
@@ -337,7 +353,7 @@ public class GlobalFunctions extends ScriptableObject {
 		}
 	}
 
-	public static String uIS_GetValue(int mskey,
+	public String uIS_GetValue(int mskey,
 			int idStore,
 			String attrName) {
 		final String M = "uIS_GetValue: ";
@@ -346,7 +362,7 @@ public class GlobalFunctions extends ScriptableObject {
 		String ret = "";
 		ResultSet rs = null;
 		try {
-			Connection con = Utl.getConnection();
+			Connection con = myUtl.getConnection();
 
 			// Figure out identity store from mskey if no identity store is
 			// given.
@@ -436,7 +452,7 @@ public class GlobalFunctions extends ScriptableObject {
 					taskId);
 
 			String sqlStatement = "SELECT IDStore FROM MXP_Tasks where TaskID = ?";
-			Connection con = Utl.getConnection();
+			Connection con = myUtl.getConnection();
 			PreparedStatement getValueStatement = con
 					.prepareStatement(sqlStatement);
 			getValueStatement.setInt(1,
@@ -461,7 +477,7 @@ public class GlobalFunctions extends ScriptableObject {
 		return idStore;
 	}
 
-	public static String uIS_nGetValues(int mskey,
+	public String uIS_nGetValues(int mskey,
 			String attrName,
 			Object separator) {
 		final String M = "uIS_nGetValues: ";
@@ -482,7 +498,7 @@ public class GlobalFunctions extends ScriptableObject {
 		ResultSet rs = null;
 		String ret = "";
 		try {
-			Connection con = Utl.getConnection();
+			Connection con = myUtl.getConnection();
 			PreparedStatement getValuesStatement = con.prepareStatement(
 					"select avalue from idmv_value_basic where mskey = ? and attrname = ?");
 			getValuesStatement.setInt(1,
@@ -536,7 +552,7 @@ public class GlobalFunctions extends ScriptableObject {
 			}
 		}
 
-		Session mailSession = myConf.getEmailSession();
+		Session mailSession = myConfiguration.getEmailSession();
 		
 		try {
 			MimeMessage emailMessage = new MimeMessage(mailSession);

@@ -1,0 +1,9 @@
+"mcPackageID","mcScriptName","mcScriptLanguage","mcScriptDefinition","mcEnabled"
+1,s1,JScript,"function s1() {return 'Hello from p1'}",1
+1,s2,JScript,"function s2() {return 'Hello from p1'}",1
+1,s3,JScript,"function s3() {return 'Hello from p1'}",1
+1,s4,JScript,"function s4() {return 'Hello from p1'}",1
+2,s1,JScript,"function s1() {return 'Hello from p2'}",1
+2,s2,JScript,"function s2() {return 'Hello from p2'}",1
+2,s3,JScript,"function s3() {return 'Hello from p2'}",1
+2,s4,JScript,"function s4() {return 'Hello from p2'}",1

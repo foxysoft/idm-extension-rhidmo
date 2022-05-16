@@ -15,16 +15,14 @@
  ******************************************************************************/
 package de.foxysoft.rhidmo.test;
 
+import static org.mockito.ArgumentMatchers.eq;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
-
 import de.foxysoft.rhidmo.PackageScript;
-import de.foxysoft.rhidmo.Utl;
+import de.foxysoft.rhidmo.Rhidmo;
 import de.foxysoft.rhidmo.mock.Task;
 
 public class TestUtlGetScriptNamesOfTask {
@@ -40,9 +38,9 @@ public class TestUtlGetScriptNamesOfTask {
 		exp.add(new PackageScript(MAIN));
 
 		Task mockTask = Mockito.mock(Task.class);
-		Mockito.when(mockTask.getParameter(Matchers.eq(EVENT)))
+		Mockito.when(mockTask.getParameter(eq(EVENT)))
 				.thenReturn(MAIN);
-		List<PackageScript> act = Utl.getScriptNamesOfTask(mockTask,
+		List<PackageScript> act = Rhidmo.getUtl().getScriptNamesOfTask(mockTask,
 				EVENT);
 		Assert.assertEquals(exp,
 				act);
@@ -55,12 +53,12 @@ public class TestUtlGetScriptNamesOfTask {
 		exp.add(new PackageScript(REQ1_VALUE));
 
 		Task mockTask = Mockito.mock(Task.class);
-		Mockito.when(mockTask.getParameter(Matchers.eq(EVENT)))
+		Mockito.when(mockTask.getParameter(eq(EVENT)))
 				.thenReturn(MAIN);
-		Mockito.when(mockTask.getParameter(Matchers.eq(REQ1_KEY)))
+		Mockito.when(mockTask.getParameter(eq(REQ1_KEY)))
 				.thenReturn(REQ1_VALUE);
 
-		List<PackageScript> act = Utl.getScriptNamesOfTask(mockTask,
+		List<PackageScript> act = Rhidmo.getUtl().getScriptNamesOfTask(mockTask,
 				EVENT);
 		Assert.assertEquals(exp,
 				act);

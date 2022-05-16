@@ -24,7 +24,6 @@ import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
-
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
 public class TaskProcessingStatic {
@@ -82,6 +81,7 @@ public class TaskProcessingStatic {
 		LOG.debug(M + "Entering eventName = {}",
 				eventName);
 		Object[] result = null;
+		Utl utl = null;
 
 		Context context = Context.enter();
 
@@ -96,24 +96,25 @@ public class TaskProcessingStatic {
 			LOG.debug(M + "taskId = {}",
 					taskId);
 
-			List<PackageScript> packageScripts = Utl
+			utl = Rhidmo.getUtl();
+			List<PackageScript> packageScripts = utl
 					.getScriptNamesOfTask(task,
 							eventName);
 
-			Utl.fetchScriptSource(packageScripts,
+			utl.fetchScriptSource(packageScripts,
 					taskId);
 
 			// Scriptable scope = context.initStandardObjects();
 			Scriptable scope = new ImporterTopLevel(Context.getCurrentContext());
 
-			Scriptable gf = new GlobalFunctions(task);
+			Scriptable gf = new GlobalFunctions(task, Rhidmo.getRhidmoConfiguration(), Rhidmo.getUtl());
 			gf.setParentScope(scope);
 
-			Utl.registerPublicMethodsInScope(
+			utl.registerPublicMethodsInScope(
 					GlobalFunctions.class,
 					scope, gf);
 
-			Function f = Utl.execScriptsInScope(packageScripts,
+			Function f = utl.execScriptsInScope(packageScripts,
 					scope,
 					context,
 					taskId);

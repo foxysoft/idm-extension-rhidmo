@@ -17,13 +17,9 @@ package de.foxysoft.rhidmo;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
-
 import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import javax.naming.InitialContext;
-
 import org.mozilla.javascript.ContextFactory;
-
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -100,11 +96,14 @@ public class Init {
 			ContextFactory.getGlobal()
 					.initApplicationClassLoader(combinedClassLoader);
 			LOG.debug(M + "Rhino classloader initialized");
-			
-			// Get the application properties
-			RhidmoConfiguration myConf = RhidmoConfiguration.getInstance();
+
+			// =================================================================================
+			// Perform stage 2 initialization of instances returned by de.foxysoft.rhidmo.Rhidmo
+			// =================================================================================
+			RhidmoConfiguration myConf = Rhidmo.getRhidmoConfiguration();
 			Object appCfg = null;
 			try {
+			    // Get the application properties
 				appCfg = ctx.lookup("ApplicationConfiguration");
 				if(appCfg == null) {
 					LOG.error(M + "Unable to read application configuration");

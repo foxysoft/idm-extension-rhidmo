@@ -18,7 +18,7 @@
   <parent>
     <artifactId>rhidmo</artifactId>
     <groupId>de.foxysoft.idm</groupId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>rhidmo-ear</artifactId>
@@ -26,7 +26,7 @@
   <dependencies>
     <dependency>
       <groupId>de.foxysoft.idm</groupId>
-      <artifactId>rhidmo-servlet</artifactId>
+      <artifactId>rhidmo-servlet-war</artifactId>
       <type>war</type>
     </dependency>
   </dependencies>
@@ -39,7 +39,7 @@
           <modules>
             <webModule>
               <groupId>de.foxysoft.idm</groupId>
-              <artifactId>rhidmo-servlet</artifactId>
+              <artifactId>rhidmo-servlet-war</artifactId>
               <contextRoot>/rhidmo</contextRoot>
             </webModule>
           </modules>

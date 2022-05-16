@@ -15,15 +15,15 @@
  ******************************************************************************/
 package de.foxysoft.rhidmo.test;
 
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-
-import de.foxysoft.rhidmo.Utl;
+import de.foxysoft.rhidmo.Rhidmo;
 
 public class TestUtl {
 
@@ -44,18 +44,17 @@ public class TestUtl {
 	public void testRegisterGlobalFunctions() throws Exception {
 		Scriptable mockScope = Mockito.mock(Scriptable.class);
 		Scriptable mockGlobalFunctionScope = new MockGlobalFunctions();
-		Utl.registerPublicMethodsInScope(
+		Rhidmo.getUtl().registerPublicMethodsInScope(
 				MockGlobalFunctions.class,
 				mockScope, mockGlobalFunctionScope);
 		Mockito.verify(mockScope)
-				.put(Matchers.eq("rhidmo_someMethod"),
-						Matchers.eq(mockScope),
-						Matchers.argThat(
+				.put(eq("rhidmo_someMethod"),
+						eq(mockScope),
+						argThat(
 								new ArgumentMatcher<FunctionObject>() {
 									@Override
 									public boolean matches(
-											Object argument) {
-										FunctionObject fo = (FunctionObject) argument;
+									    FunctionObject fo) {
 										return fo.getFunctionName()
 												.equals("rhidmo_someMethod")
 												&& fo.getArity() == 2;
