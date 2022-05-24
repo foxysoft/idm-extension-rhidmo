@@ -361,8 +361,9 @@ public class GlobalFunctions extends ScriptableObject {
 
 		String ret = "";
 		ResultSet rs = null;
+		Connection con = null;
 		try {
-			Connection con = myUtl.getConnection();
+			con = myUtl.getConnection();
 
 			// Figure out identity store from mskey if no identity store is
 			// given.
@@ -431,6 +432,11 @@ public class GlobalFunctions extends ScriptableObject {
 					rs.close();
 			} catch (Exception e) {
 			}
+            try {
+              if (con != null)
+                  con.close();
+          } catch (Exception e) {
+          }
 		}
 
 		LOG.debug(M + "Returning = {}",
@@ -444,6 +450,7 @@ public class GlobalFunctions extends ScriptableObject {
 
 		ResultSet rs = null;
 		int idStore = 0;
+		Connection con = null;
 		try {
 			int taskId = ((Integer) this.myTask.getClass()
 					.getMethod("getID")
@@ -452,7 +459,7 @@ public class GlobalFunctions extends ScriptableObject {
 					taskId);
 
 			String sqlStatement = "SELECT IDStore FROM MXP_Tasks where TaskID = ?";
-			Connection con = myUtl.getConnection();
+			con = myUtl.getConnection();
 			PreparedStatement getValueStatement = con
 					.prepareStatement(sqlStatement);
 			getValueStatement.setInt(1,
@@ -470,6 +477,11 @@ public class GlobalFunctions extends ScriptableObject {
 					rs.close();
 			} catch (Exception e) {
 			}
+            try {
+              if (con != null)
+                  con.close();
+          } catch (Exception e) {
+          }
 		}
 
 		LOG.debug(M + "Returning ID Store = {}",
@@ -497,8 +509,9 @@ public class GlobalFunctions extends ScriptableObject {
 
 		ResultSet rs = null;
 		String ret = "";
+		Connection con = null;
 		try {
-			Connection con = myUtl.getConnection();
+			con = myUtl.getConnection();
 			PreparedStatement getValuesStatement = con.prepareStatement(
 					"select avalue from idmv_value_basic where mskey = ? and attrname = ?");
 			getValuesStatement.setInt(1,
@@ -521,6 +534,11 @@ public class GlobalFunctions extends ScriptableObject {
 					rs.close();
 			} catch (Exception e) {
 			}
+            try {
+              if (con != null)
+                  con.close();
+          } catch (Exception e) {
+          }
 		}
 
 		LOG.debug(M + "Returning = {}",
