@@ -20,7 +20,7 @@ public class JdbcUnitTest {
   protected String m_testName;
 
   private static final String[] TABLE_NAMES =
-      new String[] {"mc_package_scripts", "mxp_tasks", "mc_package"};
+      new String[] {"mc_package_scripts", "mxp_tasks", "mc_package", "idmv_value_basic", "mxi_attributes"};
   private static final String SCHEMA_PATH = "/de/foxysoft/rhidmo/test/schema/";
   private static final String DATA_PATH = "/de/foxysoft/rhidmo/test/data/";
 
