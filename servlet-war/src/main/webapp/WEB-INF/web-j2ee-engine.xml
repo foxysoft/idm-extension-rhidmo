@@ -16,7 +16,7 @@
 -->
 <web-j2ee-engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:noNamespaceSchemaLocation="web-j2ee-engine.xsd">
-  <spec-version>2.3</spec-version>
+  <spec-version>2.4</spec-version>
   <resource-ref>
     <res-ref-name>jdbc/RHIDMO_RT</res-ref-name>
     <res-link>jdbc/RHIDMO_RT</res-link>

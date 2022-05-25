@@ -36,6 +36,7 @@
         <artifactId>maven-ear-plugin</artifactId>
         <version>2.10.1</version>
         <configuration>
+          <version>1.4</version>
           <modules>
             <webModule>
               <groupId>de.foxysoft.idm</groupId>
