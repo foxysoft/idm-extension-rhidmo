@@ -22,12 +22,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Log {
-	private Logger m_logger;
+	protected Logger m_logger;
 
+	@SuppressWarnings("unused")
 	private Log() {
 	}
 
-	private Log(Logger logger) {
+	protected Log(Logger logger) {
 		m_logger = logger;
 	}
 
