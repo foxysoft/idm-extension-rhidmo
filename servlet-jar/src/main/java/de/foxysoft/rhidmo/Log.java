@@ -61,12 +61,12 @@ public class Log {
 	}
 
 	public void error(String m) {
-		m_logger.debug(m);
+		m_logger.error(m);
 	}
 
 	public void error(String m,
 			Object... args) {
-		m_logger.debug(m,
+		m_logger.error(m,
 				args);
 	}
 
