@@ -19,7 +19,7 @@ Include at least the following information:
 **Logs**
 Go to **SAP NetWeaver Administrator (NWA) > Troubleshooting > Logs and Traces > Log Viewer**. Inside Log Viewer, navigate to View > Open View... > Developer Traces. 
 
-If there's any message with severity error and location de.foxysoft.*, expand its content by clicking on the **Details** button (the + icon in the leftmost column). In the Log Record Details control, click the **Show Full Message** link. If an exception occurred, the full Java stack trace will be displayed, which usually contains the most valuable information we need to analyze and solve your problem.
+If there's any message with severity error and location de.foxysoft.\*, expand its content by clicking on the **Details** button (the + icon in the leftmost column). In the Log Record Details control, click the **Show Full Message** link. If an exception occurred, the full Java stack trace will be displayed, which usually contains the most valuable information we need to analyze and solve your problem.
 
 Copy and paste the complete log message content into this GitHub issue.
 
