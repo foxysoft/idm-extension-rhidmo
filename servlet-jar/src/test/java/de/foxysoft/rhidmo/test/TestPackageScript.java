@@ -75,4 +75,17 @@ public class TestPackageScript {
 				two.hashCode());
 		Assert.assertTrue(one.equals(two));
 	}
+	
+	@Test
+	public void testEqualsNonInternedString() throws Exception {
+	  StringBuffer sb = new StringBuffer();
+	  sb.append('a').append('/').append('b');
+	  String qualifiedName1 = sb.toString(); /* "a/b" */
+	  String qualifiedName2 = sb.append('c').toString().substring(0, sb.length() - 1); /* "a/b" */
+	  Assert.assertEquals(qualifiedName1, qualifiedName2);
+	  
+	  PackageScript one = new PackageScript(qualifiedName1);
+	  PackageScript two = new PackageScript(qualifiedName2);
+	  Assert.assertEquals(one, two);
+	}
 }
