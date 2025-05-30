@@ -45,7 +45,7 @@ The latest version of this changelog can be found at https://github.com/foxysoft
 ### Fixed
 - Only fetch script source with mcEnabled=1 and mcIsObsoleted=0, required for SAP&reg; IDM 8.0 SP6+
 - Build fails with "class file for java.lang.AutoCloseable not found" #1
-- mc_package_scripts.mcisobsoleted doesnt exist in all support package levels #2
+- mc_package_scripts.mcisobsoleted doesn't exist in all support package levels #2
 
 ## [1.0.0] - 2018-01-25
 ### Added
