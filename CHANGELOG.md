@@ -1,0 +1,59 @@
+# Rhidmo&reg; Change Log
+All notable changes to Rhidmo&reg; will be documented in this file.
+Rhidmo&reg; adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+The latest version of this changelog can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
+
+## [Unreleased]
+- Add this CHANGELOG
+
+## [1.1.2] - 2025-04-28
+### Added
+- Animated GIF in README.md
+
+### Fixed
+- Fix documentation regarding available support options
+
+## [1.1.1] - 2023-07-29
+### Added
+- Add issue template to GitHub project
+
+### Fixed
+- PackageScript.equals incorrectly compares strings #10
+- Bump H2 Database from 2.1.212 to 2.2.220 in test dependencies (fixes CVE-2022-45868)
+
+## [1.1.0] - 2022-06-24
+### Added
+- Add support for using scripts from packages other than the form's own #5
+
+### Fixed
+- Update external SAP&reg; IDM hyperlink in README.md
+- Bump junit version from 4.12 to 4.13.1 in test dependencies
+- Fix resource leak from not closing JDBC connections in global functions #7
+- Fix wrong severity DEBUG instead of ERROR in global function uError #8
+- Fix deploy warning from JLinEE #6
+- Misc. cleanup (use UNIX line-endings, add missing license headers, optimize pom.xml)
+
+## [1.0.1] - 2018-05-04
+### Added
+- Add new global function uSendSMTPMessage
+- Support more cryptographic algorithms in addition to DES3CBC in global functions uEncrypt and uDecrypt:
+   - AES128CBC
+   - AES192CBC
+   - AES256CBC
+
+### Fixed
+- Only fetch script source with mcEnabled=1 and mcIsObsoleted=0, required for SAP&reg; IDM 8.0 SP6+
+- Build fails with "class file for java.lang.AutoCloseable not found" #1
+- mc_package_scripts.mcisobsoleted doesnt exist in all support package levels #2
+
+## [1.0.0] - 2018-01-25
+### Added
+- First public release
+
+[Unreleased]: ../../compare/1.1.2...HEAD
+[1.1.2]:      ../../compare/1.1.1...1.1.2
+[1.1.1]:      ../../compare/1.1.0...1.1.1
+[1.1.0]:      ../../compare/1.0.1...1.1.0
+[1.0.1]:      ../../compare/1.0.0...1.0.1
+[1.0.0]:      ../../releases/tag/1.0.0

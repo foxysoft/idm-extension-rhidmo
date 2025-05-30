@@ -29,6 +29,7 @@
         <include>README.txt</include>
         <include>LICENSE.txt</include>
         <include>NOTICE.txt</include>
+        <include>CHANGELOG.txt</include>
       </includes>
       <lineEnding>dos</lineEnding>
     </fileSet>
