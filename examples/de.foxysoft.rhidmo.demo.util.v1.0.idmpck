@@ -1,0 +1,265 @@
+<IDM EXPORTED_ON="2025-06-05 12:00:00.000" IS_PACKAGE_FOLDER_EXPORT="0" PACKAGE_TRANSPORT_VERSION="8#0#8#2020#0#1#800SP8#1815#1815#1807" SCHEMA_VERSION="1815">
+<PACKAGES>
+<PACKAGE MCQUALIFIEDNAME="de.foxysoft.rhidmo.demo.util">
+<MCDISPLAYNAME>de.foxysoft.rhidmo.demo.util</MCDISPLAYNAME>
+<MCLASTMODIFIED>1748951050450</MCLASTMODIFIED>
+<MCMAJORVERSION>1</MCMAJORVERSION>
+<MCMINORVERSION>0</MCMINORVERSION>
+<MCPACKAGELEVEL>1815</MCPACKAGELEVEL>
+<MCPACKAGETYPE>0</MCPACKAGETYPE>
+<MCQUALIFIEDNAME>de.foxysoft.rhidmo.demo.util</MCQUALIFIEDNAME>
+<PUBLIC_REFERENCES>
+<PUBLIC_REFERENCE>
+<MCNAME>rhidmo_util_formatMessage</MCNAME>
+<MCPACKAGEID>de.foxysoft.rhidmo.demo.util</MCPACKAGEID>
+<MCREFERENCE>rhidmo_util_formatMessage</MCREFERENCE>
+<MCTYPE>12</MCTYPE>
+</PUBLIC_REFERENCE>
+<PUBLIC_REFERENCE>
+<MCNAME>rhidmo_util_fromHex</MCNAME>
+<MCPACKAGEID>de.foxysoft.rhidmo.demo.util</MCPACKAGEID>
+<MCREFERENCE>rhidmo_util_fromHex</MCREFERENCE>
+<MCTYPE>12</MCTYPE>
+</PUBLIC_REFERENCE>
+</PUBLIC_REFERENCES>
+<PACKAGE_SCRIPTS>
+<SCRIPT>
+<MCENABLED>1</MCENABLED>
+<MCPACKAGEID>de.foxysoft.rhidmo.demo.util</MCPACKAGEID>
+<MCPROTECTED>0</MCPROTECTED>
+<MCSCRIPTDEFINITION>/*******************************************************************************
+ * Copyright 2025 Lambert Giese
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+/**
+ * Use templateId to look up a message template from database table MC_TEMPLATES
+ * in the language and language country provided by locale. Then format this template
+ * using the parameters provided in msgParams.
+ *
+ * Technically, parameter replacement is implemented using java.text.MessageFormat
+ * Please check parameter syntax and quoting rules at:
+ * https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html
+ *
+ * @param {string|java.lang.String} templateId - template ID as in database table MC_TEMPLATES.MCID
+ * @param {java.util.Locale} locale - Java locale object to determine language and language country
+ * @param {Array|java.lang.Object[]} [msgParams] - optional message parameters
+ * @param {string|java.lang.String} [fallbackText] - optional fallback template text when no matching template is found in database
+ * @returns {string} localized template text with parameters filled in or error message prefixed with "!ERROR"
+ * @requires rhidmo_util_fromHex
+ */
+function rhidmo_util_formatMessage(templateId, locale, msgParams, fallbackText) {
+    var messageStringJava;
+    var messageStringJs;
+
+    // In SAP(R) NetWeaver, both language and country are contained in the return value of getLanguage()
+    var sapLocaleValue = locale.getLanguage();
+    var language;
+    var languageCountry;
+
+    var matches = /^([^_]+)_?([^_]+)?.*$/.exec(sapLocaleValue);
+    if (matches != null) {
+        language = matches[1] ? matches[1].toUpperCase() : "";
+        languageCountry = matches[2] ? matches[2].toUpperCase() : "";
+    }
+
+    if (!language) {
+        uWarning("Locale doesn't specify any language - using EN as fallback");
+    }
+
+    var templateHex;
+    var templateStr;
+    var sql;
+
+    // 1. Try lookup with locale language and country if we have both
+    if (languageCountry) {
+        sql = "select mctemplate from mc_templates where mcid='" + templateId + "' and mclanguage='" + language + "'" + " and mclanguagecountry='" + languageCountry + "'";
+        templateHex = uSelect(sql);
+    }
+
+    // 2. If not found, try lookup with locale language and NULL country
+    if (!templateHex) {
+        sql = "select mctemplate from mc_templates where mcid='" + templateId + "' and mclanguage='" + language + "'" + " and mclanguagecountry is null";
+        templateHex = uSelect(sql);
+    }
+
+    // 3. If still not found, try caller-provided fallback text, if supplied
+    if (!templateHex) {
+        if (fallbackText) {
+            uWarning("Template [" + templateId + "] not found for locale [" + locale + "]; using fallback text");
+            templateStr = fallbackText;
+        }
+        // or give up if not supplied
+        else {
+            return "!ERROR: Template [" + templateId + "] not found for locale [" + locale + "] and no fallback text provided";
+        }
+    } else {
+        templateStr = rhidmo_util_fromHex(templateHex);
+        if (templateStr.indexOf("!ERROR") == 0) {
+
+            // Hex-decoding failed, return error message as is
+            return templateStr;
+        }
+    }
+
+    var mf = new java.text.MessageFormat(templateStr, locale);
+    messageStringJava = mf.format(msgParams, new java.lang.StringBuffer(), null).toString();
+    messageStringJs = ("" + messageStringJava);
+
+    return messageStringJs;
+}</MCSCRIPTDEFINITION>
+<MCSCRIPTLANGUAGE>JScript</MCSCRIPTLANGUAGE>
+<MCSCRIPTLASTCHANGE>1748957653986</MCSCRIPTLASTCHANGE>
+<MCSCRIPTNAME>rhidmo_util_formatMessage</MCSCRIPTNAME>
+<MCSCRIPTSTATUS>0</MCSCRIPTSTATUS>
+</SCRIPT>
+<SCRIPT>
+<MCENABLED>1</MCENABLED>
+<MCPACKAGEID>de.foxysoft.rhidmo.demo.util</MCPACKAGEID>
+<MCPROTECTED>0</MCPROTECTED>
+<MCSCRIPTDEFINITION>/*******************************************************************************
+ * Copyright 2025 Lambert Giese
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+/**
+ * Decode a byte array represented as hex-encoded string and convert that into a string
+ * using the provided encoding, or the Java runtime's default encoding.
+ *
+ * @param hex {string|java.lang.String} hex-encoded bytes, optionally with prefix "{HEX}"
+ * @param encoding {string|java.lang.String} [encoding=platform default] name of character encoding, e.g. "UTF-8"
+ * @returns {string} decoded JavaScript string or error message prefixed with "!ERROR"
+ */
+function rhidmo_util_fromHex(hex, encoding) {
+
+    if (!hex) {
+        return "!ERROR: Parameter hex is mandatory";
+    }
+
+    // Make sure hex is a JavaScript string
+    hex = ("" + hex);
+
+    var PREFIX = "{HEX}";
+    if (hex.indexOf(PREFIX) == 0) {
+        hex = hex.substring(PREFIX.length);
+    }
+
+    if (hex.length % 2 != 0) {
+        return "!ERROR: Hex string must have even length";
+    }
+
+    var len = hex.length;
+    var decodedBytes = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, len / 2);
+
+    // Cannot explicitly cast from int to byte in Mozilla Rhino, hence use a Java ByteBuffer
+    // for accessing the individual bytes making up a Java integer
+    var bytesOfOneInteger = java.nio.ByteBuffer.allocate(4);
+
+    for (var i = 0; i &lt; len; i += 2) {
+        var hi = parseInt(hex[i], 16);
+        if (isNaN(hi)) {
+            return "!ERROR: high byte is not a valid hex digit: " + hex[i];
+        }
+
+        var lo = parseInt(hex[i + 1], 16);
+        if (isNaN(lo)) {
+            return "!ERROR: low byte is not a valid hex digit: " + hex[i + 1];
+        }
+
+        var uint = ((hi &lt;&lt; 4) + lo) &amp; 0xFF;
+
+        // Type conversion: JavaScript number to 4-byte Java integer
+        bytesOfOneInteger.clear().putInt(uint);
+
+        // Get least significant byte from index 3 (ByteBuffer stores as big endian)
+        decodedBytes[i / 2] = bytesOfOneInteger.array()[3];
+    }
+
+    var charset;
+    if (encoding) {
+        try {
+            charset = java.nio.charset.Charset.forName(encoding);
+        } catch (e) {
+            return "!ERROR: Unsupported charset [" + encoding + "]";
+        }
+    } else {
+        charset = java.nio.charset.Charset.defaultCharset();
+    }
+
+    var decodedStringJava = new java.lang.String(decodedBytes, charset);
+    var decodedStringJs = ("" + decodedStringJava);
+
+    return decodedStringJs;
+}</MCSCRIPTDEFINITION>
+<MCSCRIPTLANGUAGE>JScript</MCSCRIPTLANGUAGE>
+<MCSCRIPTLASTCHANGE>1748957815526</MCSCRIPTLASTCHANGE>
+<MCSCRIPTNAME>rhidmo_util_fromHex</MCSCRIPTNAME>
+<MCSCRIPTSTATUS>0</MCSCRIPTSTATUS>
+</SCRIPT>
+</PACKAGE_SCRIPTS>
+<FOLDERS>
+<FOLDER GROUPGUID="179f05cfbfa748b59f50a66072ff9d9c">
+<ACTIVATEDATE>1748704030586</ACTIVATEDATE>
+<GROUP_NAME>Jobs</GROUP_NAME>
+<GROUP_STATUS>1</GROUP_STATUS>
+<MCPACKAGEID>de.foxysoft.rhidmo.demo.util</MCPACKAGEID>
+<MCSOURCEGUID>179f05cfbfa748b59f50a66072ff9d9c</MCSOURCEGUID>
+<PROVISION_GROUP>0</PROVISION_GROUP>
+<WFAUTOEXPAND>0</WFAUTOEXPAND>
+<WFDISPLAYORDER>50</WFDISPLAYORDER>
+<WFSHOWGROUP>0</WFSHOWGROUP>
+</FOLDER>
+<FOLDER GROUPGUID="498533380d634e1ca257a66072ff9d9c">
+<ACTIVATEDATE>1748704030586</ACTIVATEDATE>
+<GROUP_NAME>Forms</GROUP_NAME>
+<GROUP_STATUS>1</GROUP_STATUS>
+<MCPACKAGEID>de.foxysoft.rhidmo.demo.util</MCPACKAGEID>
+<MCSOURCEGUID>498533380d634e1ca257a66072ff9d9c</MCSOURCEGUID>
+<PROVISION_GROUP>5</PROVISION_GROUP>
+<WFAUTOEXPAND>0</WFAUTOEXPAND>
+<WFDISPLAYORDER>50</WFDISPLAYORDER>
+<WFSHOWGROUP>1</WFSHOWGROUP>
+</FOLDER>
+<FOLDER GROUPGUID="cab8fdecbf4c4deb9978a66072ff9d9c">
+<ACTIVATEDATE>1748704030586</ACTIVATEDATE>
+<GROUP_NAME>Processes</GROUP_NAME>
+<GROUP_STATUS>1</GROUP_STATUS>
+<MCPACKAGEID>de.foxysoft.rhidmo.demo.util</MCPACKAGEID>
+<MCSOURCEGUID>cab8fdecbf4c4deb9978a66072ff9d9c</MCSOURCEGUID>
+<PROVISION_GROUP>1</PROVISION_GROUP>
+<WFAUTOEXPAND>0</WFAUTOEXPAND>
+<WFDISPLAYORDER>50</WFDISPLAYORDER>
+<WFSHOWGROUP>0</WFSHOWGROUP>
+</FOLDER>
+</FOLDERS>
+</PACKAGE>
+</PACKAGES>
+<PACKAGE_HISTORY>
+<MCDESCRIPTION>Initial commit</MCDESCRIPTION>
+<MCMODIFIEDBYUSERNAME>ADMIN</MCMODIFIEDBYUSERNAME>
+<MCMODIFIEDDATE>1748951050000</MCMODIFIEDDATE>
+<MCPACKAGEID>de.foxysoft.rhidmo.demo.util</MCPACKAGEID>
+</PACKAGE_HISTORY>
+</IDM>
