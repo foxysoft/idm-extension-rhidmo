@@ -5,6 +5,9 @@ Rhidmo&reg; adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 The latest version of this changelog can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 ## [Unreleased]
+- nothing at this time
+
+## [1.2.0] - 2025-06-05
 - Add Rhidmo example packages
 - Add this CHANGELOG
 
@@ -52,7 +55,8 @@ The latest version of this changelog can be found at https://github.com/foxysoft
 ### Added
 - First public release
 
-[Unreleased]: ../../compare/1.1.2...HEAD
+[Unreleased]: ../../compare/1.2.0...HEAD
+[1.2.0]:      ../../compare/1.1.2...1.2.0
 [1.1.2]:      ../../compare/1.1.1...1.1.2
 [1.1.1]:      ../../compare/1.1.0...1.1.1
 [1.1.0]:      ../../compare/1.0.1...1.1.0

@@ -8,6 +8,10 @@ foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 Unreleased
 
+  • nothing at this time
+
+1.2.0 - 2025-06-05
+
   • Add Rhidmo example packages
   • Add this CHANGELOG
 
