@@ -5,7 +5,12 @@ Rhidmo&reg; adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 The latest version of this changelog can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 ## [Unreleased]
-- nothing at this time
+### Added
+- Add ROADMAP
+
+### Fixed
+- Missing default language in demo content
+- Cleanup in installation manual
 
 ## [1.2.0] - 2025-06-05
 - Add Rhidmo example packages

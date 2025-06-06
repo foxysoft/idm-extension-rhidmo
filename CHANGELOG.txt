@@ -8,7 +8,14 @@ foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 Unreleased
 
-  • nothing at this time
+Added
+
+  • Add ROADMAP
+
+Fixed
+
+  • Missing default language in demo content
+  • Cleanup in installation manual
 
 1.2.0 - 2025-06-05
 
