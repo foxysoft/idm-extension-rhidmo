@@ -76,6 +76,7 @@ function rhidmo_util_formatMessage(templateId, locale, msgParams, fallbackText) 
 
     if (!language) {
         uWarning("Locale doesn't specify any language - using EN as fallback");
+        language="EN";
     }
 
     var templateHex;
