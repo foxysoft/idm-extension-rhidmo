@@ -148,8 +148,8 @@ function rhidmo_util_formatMessage(templateId, locale, msgParams, fallbackText) 
  * Decode a byte array represented as hex-encoded string and convert that into a string
  * using the provided encoding, or the Java runtime's default encoding.
  *
- * @param hex {string|java.lang.String} hex-encoded bytes, optionally with prefix "{HEX}"
- * @param encoding {string|java.lang.String} [encoding=platform default] name of character encoding, e.g. "UTF-8"
+ * @param {string|java.lang.String} hex - hex-encoded bytes, optionally with prefix "{HEX}"
+ * @param {string|java.lang.String} [encoding=platform default] name of character encoding, e.g. "UTF-8"
  * @returns {string} decoded JavaScript string or error message prefixed with "!ERROR"
  */
 function rhidmo_util_fromHex(hex, encoding) {
