@@ -21,6 +21,7 @@ import javax.mail.Session;
 import javax.naming.InitialContext;
 import org.mozilla.javascript.ContextFactory;
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 
@@ -61,7 +62,7 @@ public class Init {
 			Class<?> baseClass = Class.forName(
 					"com.sap.idm.extension.TaskProcessingAdapter",
 					true,
-					jmxClassLoader);
+					combinedClassLoader);
 			LOG.debug(M + "baseClass.getName() = {}",
 					baseClass.getName());
 
@@ -76,7 +77,7 @@ public class Init {
 					.intercept(MethodDelegation
 							.to(TaskProcessingStatic.class))
 					.make()
-					.load(combinedClassLoader)
+					.load(combinedClassLoader, ClassLoadingStrategy.Default.INJECTION)
 					.getLoaded();
 			LOG.debug(M + "subClass.getName() = {}",
 					subClass.getName());
