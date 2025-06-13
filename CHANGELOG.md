@@ -11,6 +11,7 @@ The latest version of this changelog can be found at https://github.com/foxysoft
 ### Fixed
 - Missing default language in demo content
 - Cleanup in installation manual
+- Update production dependency ByteBuddy to 1.17.5 (latest)
 
 ## [1.2.0] - 2025-06-05
 - Add Rhidmo example packages
