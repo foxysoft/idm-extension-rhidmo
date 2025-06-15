@@ -7,6 +7,7 @@ The latest version of this changelog can be found at https://github.com/foxysoft
 ## [Unreleased]
 ### Added
 - Add ROADMAP
+- `mvn clean verify` now generates coverage reports in `./servlet-jar/target/site/jacoco/index.html`
 
 ### Fixed
 - Missing default language in demo content

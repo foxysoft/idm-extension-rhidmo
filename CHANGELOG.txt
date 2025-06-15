@@ -11,6 +11,8 @@ Unreleased
 Added
 
   • Add ROADMAP
+  • mvn clean verify now generates coverage reports in ./servlet-jar/target/
+    site/jacoco/index.html
 
 Fixed
 
