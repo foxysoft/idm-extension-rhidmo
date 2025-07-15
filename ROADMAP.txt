@@ -28,16 +28,17 @@ guarantees either for the dates or for the provision at all.
 
    What will be changed?     When do we plan to     Is this a       Category
                                   release?      breaking change?
-Implement reproducible       2025 Q2            -                 Security
+Implement reproducible       2025 Q3            -                 Security
 builds
 Drop support for Java 6      2025 Q3            X                 Developer
                                                                   Experience
 Add a Software Bill of       2025 Q3            -                 Security
 Materials (SBOM)
-Update build environment to  2025 Q3            -                 Developer
+Update build environment to  2025 Q4            -                 Developer
 latest Java LTS                                                   Experience
 Add static code analysis to  2025 Q4            -                 Security
 build pipeline
+SLSA Level 3 compliance      2026               -                 Security
 Improve code coverage of     2026               -                 Robustness
 unit tests
 
