@@ -112,7 +112,7 @@ public class TestIniKeyStorageProvider {
 	@Test
 	public void testCaseSensitiveSection() throws Exception {
 		this.cut = newCutWithIni("case-sensitive-section.ini");
-		assertThatGetKeyAtIndexOneThrows("Lookup using section with different case key must throw");
+		assertThatGetKeyAtIndexOneThrows("Lookup using section with different case section must throw");
 	}
 
 	@Test
