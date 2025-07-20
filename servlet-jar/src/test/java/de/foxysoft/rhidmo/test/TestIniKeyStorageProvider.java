@@ -16,6 +16,9 @@
 package de.foxysoft.rhidmo.test;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 
@@ -56,19 +59,72 @@ public class TestIniKeyStorageProvider {
 	@Test
 	public void testGetKey1() throws Exception {
 		this.cut = newCutWithIni("Keys.ini");
-		cut.setKeyIndex("1");
-		byte[] actual = cut.getKey();
-		byte[] expected = UnitTestUtil.repeatBytes(CAFEBABE, 24);
-		assertArrayEquals(expected, actual);
+		assertThatGetKeyAtIndexOneEqualsCafebabe();
 	}
 
 	@Test
 	public void testGetKey2() throws Exception {
 		this.cut = newCutWithIni("Keys.ini");
-		cut.setKeyIndex("2");
-		byte[] actual = cut.getKey();
-		byte[] expected = UnitTestUtil.repeatBytes(DEADBEEF, 24);
+		assertThatGetKeyAtIndexTwoEqualsDeadbeef();
+	}
+
+	@Test
+	public void testGetCurrentKey() throws Exception {
+		this.cut = newCutWithIni("Keys.ini");
+		byte[] actual = cut.getCurrentKey();
+		byte[] expected = UnitTestUtil.repeatBytes(CAFEBABE, 24);
 		assertArrayEquals(expected, actual);
+	}
+
+	@Test
+	public void testGetCurrentKeySizeAlgorithmNotSet() throws Exception {
+		this.cut = newCutWithIni("empty-file.ini");
+		int actual = cut.getCurrentKeySize();
+		assertEquals("getCurrentKeySize() must return zero when algorithm not set", 0, actual);
+	}
+
+	@Test
+	public void testGetCurrentKeySizeAlgorithmDes3Cbc() throws Exception {
+		assertThatGetCurrentKeySizeForAlgorithmEqualsInteger("DES3CBC", 0);
+	}
+
+	@Test
+	public void testGetCurrentKeySizeAlgorithmAes128Cbc() throws Exception {
+		assertThatGetCurrentKeySizeForAlgorithmEqualsInteger("AES128CBC", 16);
+	}
+
+	@Test
+	public void testGetCurrentKeySizeAlgorithmAes192Cbc() throws Exception {
+		assertThatGetCurrentKeySizeForAlgorithmEqualsInteger("AES192CBC", 24);
+	}
+
+	@Test
+	public void testGetCurrentKeySizeAlgorithmAes256Cbc() throws Exception {
+		assertThatGetCurrentKeySizeForAlgorithmEqualsInteger("AES256CBC", 32);
+	}
+
+	@Test
+	public void testCaseSensitiveKey() throws Exception {
+		this.cut = newCutWithIni("case-sensitive-key.ini");
+		assertThatGetKeyAtIndexOneThrows("Lookup using key with different case key must throw");
+	}
+
+	@Test
+	public void testCaseSensitiveSection() throws Exception {
+		this.cut = newCutWithIni("case-sensitive-section.ini");
+		assertThatGetKeyAtIndexOneThrows("Lookup using section with different case key must throw");
+	}
+
+	@Test
+	public void testWhitespaceSurroundedKey() throws Exception {
+		this.cut = newCutWithIni("whitespace-surrounded-equals.ini");
+		assertThatGetKeyAtIndexOneEqualsCafebabe();
+	}
+
+	@Test
+	public void testWhitespaceSurroundedSection() throws Exception {
+		this.cut = newCutWithIni("whitespace-surrounded-section.ini");
+		assertThatGetKeyAtIndexOneEqualsCafebabe();
 	}
 
 	@Test
@@ -80,12 +136,6 @@ public class TestIniKeyStorageProvider {
 	@Test
 	@Ignore
 	public void testGetSecretKeyName() {
-
-	}
-
-	@Test
-	@Ignore
-	public void testGetCurrentKey() {
 
 	}
 
@@ -115,14 +165,41 @@ public class TestIniKeyStorageProvider {
 
 	@Test
 	@Ignore
-	public void testGetCurrentKeySize() {
+	public void testGetAlgorithmDescription() {
 
 	}
 
-	@Test
-	@Ignore
-	public void testGetAlgorithmDescription() {
+	private void assertThatGetKeyAtIndexOneEqualsCafebabe() throws Exception {
+		this.cut.setKeyIndex("1");
+		byte[] actual = cut.getKey();
+		byte[] expected = UnitTestUtil.repeatBytes(CAFEBABE, 24);
+		assertArrayEquals(expected, actual);
+	}
 
+	private void assertThatGetKeyAtIndexTwoEqualsDeadbeef() throws Exception {
+		this.cut.setKeyIndex("2");
+		byte[] actual = cut.getKey();
+		byte[] expected = UnitTestUtil.repeatBytes(DEADBEEF, 24);
+		assertArrayEquals(expected, actual);
+	}
+
+	private void assertThatGetKeyAtIndexOneThrows(String msg) throws Exception {
+		this.cut.setKeyIndex("1");
+		try {
+			this.cut.getKey();
+			fail(msg);
+		} catch (Exception e) {
+			assertNotNull(e);
+		}
+	}
+
+	private void assertThatGetCurrentKeySizeForAlgorithmEqualsInteger(String algorithm, int expectedKeySize)
+			throws Exception {
+		this.cut = newCutWithIni("empty-file.ini");
+		this.cut.setAlgorithmName(algorithm);
+		int actualKeySize = cut.getCurrentKeySize();
+		String msg = "getCurrentKeySize() must return [" + expectedKeySize + "] when algorithm is [" + algorithm + "]";
+		assertEquals(msg, expectedKeySize, actualKeySize);
 	}
 
 }
