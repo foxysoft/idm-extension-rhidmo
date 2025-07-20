@@ -20,7 +20,6 @@ import static org.junit.Assert.assertArrayEquals;
 import java.io.File;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,16 +30,22 @@ import de.foxysoft.rhidmo.test.util.UnitTestUtil;
 public class TestIniKeyStorageProvider {
 	private static File tempDir;
 	private static File keysIniFile;
+	private static String RESOURCE_PATH = "/de/foxysoft/rhidmo/test/ini/";
+
 	private static byte[] CAFEBABE = { (byte) 0xCA, (byte) 0xFE, (byte) 0xBA, (byte) 0xBE };
 	private static byte[] DEADBEEF = { (byte) 0xDE, (byte) 0xAD, (byte) 0xBE, (byte) 0xEF };
 
 	private IniKeyStorageProvider cut;
 
+	private IniKeyStorageProvider newCutWithIni(String name) throws Exception {
+		UnitTestUtil.copyResourceToFile(RESOURCE_PATH + name, keysIniFile);
+		return new IniKeyStorageProvider(keysIniFile);
+	}
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		tempDir = UnitTestUtil.setUpTempDir();
 		keysIniFile = new File(tempDir, "Keys.ini");
-		UnitTestUtil.copyResourceToFile("/de/foxysoft/rhidmo/test/ini/Keys.ini", keysIniFile);
 	}
 
 	@AfterClass
@@ -48,13 +53,9 @@ public class TestIniKeyStorageProvider {
 		UnitTestUtil.tearDownTempDir(tempDir);
 	}
 
-	@Before
-	public void setUp() throws Exception {
-		cut = new IniKeyStorageProvider(keysIniFile);
-	}
-
 	@Test
-	public void testGetKey1() {
+	public void testGetKey1() throws Exception {
+		this.cut = newCutWithIni("Keys.ini");
 		cut.setKeyIndex("1");
 		byte[] actual = cut.getKey();
 		byte[] expected = UnitTestUtil.repeatBytes(CAFEBABE, 24);
@@ -62,7 +63,8 @@ public class TestIniKeyStorageProvider {
 	}
 
 	@Test
-	public void testGetKey2() {
+	public void testGetKey2() throws Exception {
+		this.cut = newCutWithIni("Keys.ini");
 		cut.setKeyIndex("2");
 		byte[] actual = cut.getKey();
 		byte[] expected = UnitTestUtil.repeatBytes(DEADBEEF, 24);
