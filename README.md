@@ -12,7 +12,7 @@ Rhidmo&reg; is a generic implementation of the SAP&reg; Identity Management Exte
 Rhidmo&reg; is free and open source software available under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt). Its maintainers provide non-commerical community support for Rhidmo&reg; on a best-effort basis. If you encounter any problems, please create a GitHub issue in this repository. Commercial maintenance contracts or support options do not exist at this time.
 
 ## Build
-You need [Git](https://git-scm.com/), Java6+ and [Maven 3.x](https://maven.apache.org/) to build. Maven downloads dependencies from the Internet by default, so your build machine will need to be connected to the Internet.
+You need [Git](https://git-scm.com/), Java8+ and [Maven 3.9.x+](https://maven.apache.org/) to build. Maven downloads dependencies from the Internet by default, so your build machine will need to be connected to the Internet.
 
      git clone https://github.com/foxysoft/idm-extension-rhidmo
      cd idm-extension-rhidmo

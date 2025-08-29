@@ -9,6 +9,9 @@ The latest version of this changelog can be found at https://github.com/foxysoft
 - Add ROADMAP
 - `mvn clean verify` now generates coverage reports in `./servlet-jar/target/site/jacoco/index.html`
 
+### Changed
+- Building from source now requires Java 8+ and Maven 3.9.x+; build output still targets Java 6
+
 ### Fixed
 - Missing default language in demo content
 - Cleanup in installation manual

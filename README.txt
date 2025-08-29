@@ -21,9 +21,9 @@ options do not exist at this time.
 
 Build
 
-You need Git, Java6+ and Maven 3.x to build. Maven downloads dependencies from
-the Internet by default, so your build machine will need to be connected to the
-Internet.
+You need Git, Java8+ and Maven 3.9.x+ to build. Maven downloads dependencies
+from the Internet by default, so your build machine will need to be connected
+to the Internet.
 
  git clone https://github.com/foxysoft/idm-extension-rhidmo
  cd idm-extension-rhidmo
