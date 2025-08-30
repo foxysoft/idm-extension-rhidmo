@@ -25,14 +25,17 @@
     <module>servlet-war</module>
     <module>ear</module>
   </modules>
-  <!-- Must wrap maven.build.timestamp into user property -->
-  <!-- for successful use in resource filtering. -->
-  <!-- See https://stackoverflow.com/questions/13228472 -->
-  <!-- This property is used in SAP_MANIFEST.MF as counter, -->
-  <!-- which basically represents the SDA version number. -->
   <properties>
+    <!-- Build timestamp must be static for reproducible builds. -->
+    <!-- See https://maven.apache.org/guides/mini/guide-reproducible-builds.html -->
+    <project.build.outputTimestamp>2025-08-30T00:00:00Z</project.build.outputTimestamp>    
+    <!-- Must wrap project.build.outputTimestamp into user property -->
+    <!-- for successful use in resource filtering. -->
+    <!-- See https://stackoverflow.com/questions/13228472 -->
+    <!-- This property is used in SAP_MANIFEST.MF as counter, -->
+    <!-- which basically represents the SDA version number. -->
+    <timestamp>${project.build.outputTimestamp}</timestamp>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <timestamp>${maven.build.timestamp}</timestamp>
     <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
   </properties>
   <dependencyManagement>
