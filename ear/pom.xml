@@ -71,6 +71,36 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <execution>
+            <id>transform-build-timestamp</id>
+            <goals>
+              <goal>regex-property</goal>
+            </goals>
+            <configuration>
+              <!-- Input value (ISO8601 timestamp) -->
+              <value>${project.build.outputTimestamp}</value>
+              <!-- Regex pattern to parse input value -->
+              <regex>(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z</regex>
+              <!-- Output property name-->
+              <name>timestamp</name>
+              <!-- Output property value (timestamp digits) -->
+              <!-- This property is used in SAP_MANIFEST.MF as counter, -->
+              <!-- which basically represents the SDA version number. -->
+              <!-- ==================================================== -->
+              <!-- Must use user property timestamp instead of -->
+              <!-- project.build.outputTimestamp directly -->
+              <!-- for successful use in resource filtering. -->
+              <!-- See https://stackoverflow.com/questions/13228472 -->
+              <replacement>$1$2$3$4$5$6</replacement>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
