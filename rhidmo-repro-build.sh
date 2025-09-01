@@ -21,15 +21,15 @@ gDockerImageDigest=sha256:8135a3d9d2247f75973a23c984baf0b0b758eed1a85491d78fd434
 gDockerGroup=docker
 
 function msgErr() {
-  2>&1 printf "[\e[1;31mERROR\e[0m]: %s\n" "$@"
+  >&2 printf "[\e[1;31mERROR\e[0m]: %s\n" "$@"
 }
 
 function msgWarn() {
-  2>&1 printf "[\e[1;33mWARNING\e[0m]: %s\n" "$@"
+  >&2 printf "[\e[1;33mWARNING\e[0m]: %s\n" "$@"
 }
 
 function msgInfo() {
-  2>&1 printf "[\e[1;32mINFO\e[0m]: %s\n" "$@"
+  >&2 printf "[\e[1;32mINFO\e[0m]: %s\n" "$@"
 }
 
 function doBuild() {
