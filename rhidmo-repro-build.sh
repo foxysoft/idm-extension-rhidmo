@@ -15,10 +15,13 @@
 # the License.
 ###############################################################################
 
+gScriptName="$(basename "$0")"
 gScriptDir="$(readlink -f "$(dirname "$0")")"
 gDockerImageTag=maven:3.9.11-eclipse-temurin-8
 gDockerImageDigest=sha256:8135a3d9d2247f75973a23c984baf0b0b758eed1a85491d78fd4340a9cb35f76
 gDockerGroup=docker
+gOptionCleanup=0
+gOptionHelp=0
 
 function msgErr() {
   >&2 printf "[\e[1;31mERROR\e[0m]: %s\n" "$@"
@@ -30,6 +33,47 @@ function msgWarn() {
 
 function msgInfo() {
   >&2 printf "[\e[1;32mINFO\e[0m]: %s\n" "$@"
+}
+
+function parseArgs() {
+  while [ "${1:-}" != '' ]; do
+    case "$1" in
+      '-c' | '--cleanup')
+        gOptionCleanup=1
+        ;;
+      '-h' | '--help')
+        gOptionHelp=1
+        ;;
+      *)
+        msgErr "Unknown parameter: $1"
+        return 1
+        ;;
+    esac
+    shift
+  done
+}
+
+function usage() {
+  >&2 cat << eof
+Usage: $gScriptName [options...]
+
+Create or delete Rhidmo clean build with reproducible binary output
+DON'T USE FOR ROUTINE DEVELOPER BUILDS - IT'S A WASTE OF BANDWIDTH AND CPU.
+
+OPTIONS:
+    [ -c | --cleanup ]    Delete build results (mvn cleanup)
+    [ -h | --help    ]    Display this help message
+
+Without any options, creates a fresh containerized build environment,
+executes 'mvn clean package' inside and displays the SHA-256 digest
+of the resulting Rhidmo ZIP archive.
+
+With --cleanup, deletes all target files and directories from previous
+reproducible builds by executing 'mvn clean' inside the container.
+This is useful since target files and directories are owned by root,
+hence normal users will lack permission to delete them.
+
+eof
 }
 
 function doBuild() {
@@ -92,11 +136,27 @@ function doBuild() {
 
 function main() {
   local -i rc
-  pushd "$gScriptDir" > /dev/null || return 1
-  doBuild "$@"
+
+  parseArgs "$@"
   rc=$?
-  popd > /dev/null || :
-  return $rc
+
+  if ((rc != 0)); then
+    usage
+    return $rc
+  fi
+
+  if ((gOptionHelp == 0)); then
+
+    pushd "$gScriptDir" > /dev/null || return 1
+    doBuild "$@"
+    rc=$?
+    popd > /dev/null || :
+    return $rc
+
+  else
+    usage
+    return 0
+  fi
 }
 
 main "$@"
