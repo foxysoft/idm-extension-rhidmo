@@ -21,6 +21,7 @@ gDockerImageTag=maven:3.9.11-eclipse-temurin-8
 gDockerImageDigest=sha256:8135a3d9d2247f75973a23c984baf0b0b758eed1a85491d78fd4340a9cb35f76
 gDockerGroup=docker
 gOptionClean=0
+gOptionQuiet=0
 gOptionHelp=0
 declare -a gMavenArgs
 
@@ -41,6 +42,9 @@ function parseArgs() {
     case "$1" in
       '-c' | '--clean')
         gOptionClean=1
+        ;;
+      '-q' | '--quiet')
+        gOptionQuiet=1
         ;;
       '-h' | '--help')
         gOptionHelp=1
@@ -63,6 +67,8 @@ DON'T USE FOR ROUTINE DEVELOPER BUILDS - IT'S A WASTE OF BANDWIDTH AND CPU.
 
 OPTIONS:
     [ -c | --clean   ]    Delete build results (mvn clean)
+    [ -q | --quiet   ]    Build or clean without any diagnostic output
+                          except for the final SHA-256 on stdout
     [ -h | --help    ]    Display this help message
 
 Without any options, creates a fresh containerized build environment,
@@ -74,7 +80,35 @@ reproducible builds by executing 'mvn clean' inside the container.
 This is useful since target files and directories are owned by root,
 hence normal users will lack permission to delete them.
 
+EXIT CODES:
+    0        : success
+    non-zero : failure
 eof
+}
+
+function setupDescriptorsForQuietMode() {
+  tty -s
+  if [[ $? -eq 1 || "$gOptionQuiet" == "1" ]]; then
+    exec 3>&1 &> /dev/null
+  else
+    exec 3>&1
+  fi
+}
+
+function checkPrerequisites() {
+  if ! command -v docker > /dev/null; then
+    msgErr "This script requires docker" \
+      "Visit https://docs.docker.com/engine/install/" \
+      "and apply installation instructions for your OS"
+    return 1
+  fi
+
+  if ! id -nG | grep -qw "$gDockerGroup"; then
+    msgWarn "Current user is not member of group $gDockerGroup" \
+      "If your build fails with permission errors," \
+      "visit https://docs.docker.com/engine/install/linux-postinstall/" \
+      "and apply required post-installation steps."
+  fi
 }
 
 function displayDigest() {
@@ -98,8 +132,10 @@ function displayDigest() {
     return 1
   fi
 
-  msgInfo "Reproducible SHA-256 of Rhidmo ZIP archive:" \
-    "$digest"
+  msgInfo "Reproducible SHA-256 of Rhidmo ZIP archive:"
+
+  # Output digest to stdout even with --quiet
+  >&3 echo "$digest"
 
 }
 
@@ -107,20 +143,6 @@ function doBuild() {
   local -i rc
 
   msgInfo "Starting Rhidmo reproducible build"
-
-  if ! command -v docker > /dev/null; then
-    msgErr "This script requires docker" \
-      "Visit https://docs.docker.com/engine/install/" \
-      "and apply installation instructions for your OS"
-    return 1
-  fi
-
-  if ! id -nG | grep -qw "$gDockerGroup"; then
-    msgWarn "Current user is not member of group $gDockerGroup" \
-      "If your build fails with permission errors," \
-      "visit https://docs.docker.com/engine/install/linux-postinstall/" \
-      "and apply required post-installation steps."
-  fi
 
   # Pull Docker image not only be tag name, but also by immutable identifier (digest)
   # to have a build environment that is guaranteed NEVER to change over time.
@@ -155,6 +177,10 @@ function main() {
   fi
 
   if ((gOptionHelp == 0)); then
+
+    setupDescriptorsForQuietMode || return 1
+
+    checkPrerequisites || return 1
 
     pushd "$gScriptDir" > /dev/null || return 1
 
