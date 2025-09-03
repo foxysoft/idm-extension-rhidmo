@@ -20,8 +20,9 @@ gScriptDir="$(readlink -f "$(dirname "$0")")"
 gDockerImageTag=maven:3.9.11-eclipse-temurin-8
 gDockerImageDigest=sha256:8135a3d9d2247f75973a23c984baf0b0b758eed1a85491d78fd4340a9cb35f76
 gDockerGroup=docker
-gOptionCleanup=0
+gOptionClean=0
 gOptionHelp=0
+declare -a gMavenArgs
 
 function msgErr() {
   >&2 printf "[\e[1;31mERROR\e[0m]: %s\n" "$@"
@@ -38,8 +39,8 @@ function msgInfo() {
 function parseArgs() {
   while [ "${1:-}" != '' ]; do
     case "$1" in
-      '-c' | '--cleanup')
-        gOptionCleanup=1
+      '-c' | '--clean')
+        gOptionClean=1
         ;;
       '-h' | '--help')
         gOptionHelp=1
@@ -61,14 +62,14 @@ Create or delete Rhidmo clean build with reproducible binary output
 DON'T USE FOR ROUTINE DEVELOPER BUILDS - IT'S A WASTE OF BANDWIDTH AND CPU.
 
 OPTIONS:
-    [ -c | --cleanup ]    Delete build results (mvn cleanup)
+    [ -c | --clean   ]    Delete build results (mvn clean)
     [ -h | --help    ]    Display this help message
 
 Without any options, creates a fresh containerized build environment,
 executes 'mvn clean package' inside and displays the SHA-256 digest
 of the resulting Rhidmo ZIP archive.
 
-With --cleanup, deletes all target files and directories from previous
+With --clean, deletes all target files and directories from previous
 reproducible builds by executing 'mvn clean' inside the container.
 This is useful since target files and directories are owned by root,
 hence normal users will lack permission to delete them.
@@ -76,10 +77,34 @@ hence normal users will lack permission to delete them.
 eof
 }
 
+function displayDigest() {
+  local zipfile
+  local digest
+
+  zipfile="$(find "$gScriptDir"/ear/target -name rhidmo\*zip)"
+  rc=$?
+
+  if [[ "$rc" != "0" || ! -f "$zipfile" ]]; then
+    msgErr "Rhidmo ZIP archive not found after build, RC=$rc"
+    return 1
+  fi
+
+  # Use SHA-256 (not SHA-512) because that's what GitHub releases UI shows as of mid 2025
+  digest="$(sha256sum "$zipfile" | cut -d' ' -f1)"
+  rc=$?
+
+  if ((rc != 0)); then
+    msgErr "Rhidmo reproducible build successful, but calculating SHA-256 failed with RC=$rc"
+    return 1
+  fi
+
+  msgInfo "Reproducible SHA-256 of Rhidmo ZIP archive:" \
+    "$digest"
+
+}
+
 function doBuild() {
   local -i rc
-  local checksum
-  local zipfile
 
   msgInfo "Starting Rhidmo reproducible build"
 
@@ -104,34 +129,18 @@ function doBuild() {
     -v "$(pwd)":/usr/src/mymaven \
     -w /usr/src/mymaven \
     "$gDockerImageTag"@"$gDockerImageDigest" \
-    sh -c "java -version && mvn --version && mvn clean package"
+    sh -c "java -version && mvn --version && mvn ${gMavenArgs[*]}"
   rc=$?
 
   if ((rc != 0)); then
-    msgErr "Rhidmo reproducible build failed with RC=$rc; can't calculate SHA-256 sum"
+    msgErr "Rhidmo reproducible build failed with RC=$rc"
     return 1
   fi
 
-  zipfile="$(find "$gScriptDir"/ear/target -name rhidmo\*zip)"
-  rc=$?
-
-  if [[ "$rc" != "0" || ! -f "$zipfile" ]]; then
-    msgErr "Rhidmo ZIP archive not found after build, RC=$rc"
-    return 1
+  # Display SHA-256 on build only - cleanup has no output to digest
+  if ((gOptionClean == 0)); then
+    displayDigest || return 1
   fi
-
-  # Use SHA-256 (not SHA-512) because that's what GitHub releases UI shows as of mid 2025
-  checksum="$(sha256sum "$zipfile" | cut -d' ' -f1)"
-  rc=$?
-
-  if ((rc != 0)); then
-    msgErr "Rhidmo reproducible build successful, but calculating SHA-256 sum failed with RC=$rc"
-    return 1
-  fi
-
-  msgInfo "Reproducible SHA-256 sum of Rhidmo ZIP archive:" \
-    "$checksum"
-
 }
 
 function main() {
@@ -148,8 +157,15 @@ function main() {
   if ((gOptionHelp == 0)); then
 
     pushd "$gScriptDir" > /dev/null || return 1
+
+    gMavenArgs+=("clean")
+    if ((gOptionClean == 0)); then
+      gMavenArgs+=("package")
+    fi
+
     doBuild "$@"
     rc=$?
+
     popd > /dev/null || :
     return $rc
 
