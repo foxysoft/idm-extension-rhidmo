@@ -27,6 +27,7 @@
       <outputDirectory/>
       <includes>
         <include>README.txt</include>
+        <include>BUILD.txt</include>        
         <include>LICENSE.txt</include>
         <include>NOTICE.txt</include>
         <include>CHANGELOG.txt</include>

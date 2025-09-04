@@ -1,0 +1,52 @@
+## Build Rhidmo from Source
+All examples below assume you'll obtain the Rhidmo source code using [git](https://git-scm.com/) CLI. An alternative is to download release-specific Rhidmo source code snapshots directly from our official releases page using your browser:
+
+https://github.com/foxysoft/idm-extension-rhidmo/releases/
+
+### Non-Reproducible (aka Standard) Builds
+Non-reproducible or standard builds are perfect for building Rhidmo for routine development work. This method works cross-platform on Linux, Windows and macOS and is fast, efficient and produces correct binaries.
+
+However, the exact byte sequence of Rhidmo binaries created this way will not be reproducible by others, because it depends on the specific OS and Java version you have used for compiling. Hence, this method cannot be used to publish or verify official Rhidmo releases. For these specific cases, skip to section **[Reproducible Builds](#reproducible-builds)**.
+
+Non-reproducible builds require Java8+ and [Maven 3.9.x+](https://maven.apache.org/) to be installed on your local machine. Maven downloads dependencies from the Internet by default, so your build machine will need to be connected to the Internet.
+
+     git clone https://github.com/foxysoft/idm-extension-rhidmo
+     cd idm-extension-rhidmo
+     mvn package
+
+### Reproducible Builds
+#### Use Cases
+There are two cases where reproducible builds provide benefits over standard builds:
+
+1. As Rhidmo user, you need to **verify an existing Rhidmo binary release** available from GitHub to be bit by bit identical to what you get when building that same Rhidmo version from source.
+
+    The rationale is security, specifically preventing deployment of malicious code to your SAP® system.
+
+1. As Rhidmo committer, you're about to **publish a new Rhidmo release** on GitHub, including a new Rhidmo binary release ZIP for others to download.
+
+    The rationale is that publishing reproducible binaries is a prerequisite for others to verify their Rhidmo binary download later on (see previous case).
+
+Please note that both creating and cleaning up Rhidmo reproducible builds is terribly wasteful in terms of resources, specifically bandwidth and CPU. **Please don't perform reproducible builds without a good reason.**
+
+#### Create
+Creating and verifying reproducible Rhidmo binaries is supported starting from version 1.3.0. It currently works on Linux only and requires [Docker](https://www.docker.com/) to be installed on your local machine. Java and/or Maven are not required. As with standard builds, your build machine requires outbound Internet access.
+
+     git clone https://github.com/foxysoft/idm-extension-rhidmo
+     cd idm-extension-rhidmo
+     
+     # Reproducible builds make most sense for tagged releases - we use the latest tag here.
+     # Change to something like latestRelease="1.3.0" to verify another release's binaries.
+     latestRelease="$(git describe --tags --abbrev=0)"
+     git checkout "$latestRelease"
+     
+     ./rhidmo-repro-build.sh
+
+Not only will these commands create Rhidmo binaries as usual, but they'll also display a cryptographic hash (SHA-256) of the generated Rhidmo binary release ZIP at the end. You can manually compare this value to the hash displayed on our [releases page](https://github.com/foxysoft/idm-extension-rhidmo/releases/) next to the downloadable Rhidmo binary release (`sha256:...`). Both values must be identical.
+
+#### Cleanup
+Before switching back from reproducible to standard builds again, you'll need to perform specific cleanup. This is because target files and directories created by reproducible builds are owned by root. Hence, your next standard build will likely fail to delete or overwrite them due to permission errors.
+
+Always use the following command for cleaning up all reproducible build output and prevent file permission issues:
+
+     ./rhidmo-repro-build.sh --clean
+
