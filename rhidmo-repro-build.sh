@@ -144,7 +144,7 @@ function doBuild() {
 
   msgInfo "Starting Rhidmo reproducible build"
 
-  # Pull Docker image not only be tag name, but also by immutable identifier (digest)
+  # Pull Docker image not only by tag name, but also by immutable identifier (digest)
   # to have a build environment that is guaranteed NEVER to change over time.
   # See https://docs.docker.com/reference/cli/docker/image/pull/#pull-an-image-by-digest-immutable-identifier
   docker run -it --rm --name rhidmo-reproducible-build \
