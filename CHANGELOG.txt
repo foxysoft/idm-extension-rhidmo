@@ -10,10 +10,11 @@ Unreleased
 
 Added
 
-  • Add ROADMAP
+  • Add ROADMAP document
   • mvn clean verify now generates coverage reports in ./servlet-jar/target/
     site/jacoco/index.html
   • Add Linux shell script rhidmo-repro-build.sh for reproducible builds
+  • Add separate BUILD document and refer to that from README
 
 Changed
 

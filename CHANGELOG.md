@@ -6,9 +6,10 @@ The latest version of this changelog can be found at https://github.com/foxysoft
 
 ## [Unreleased]
 ### Added
-- Add ROADMAP
+- Add ROADMAP document
 - `mvn clean verify` now generates coverage reports in `./servlet-jar/target/site/jacoco/index.html`
 - Add Linux shell script rhidmo-repro-build.sh for reproducible builds
+- Add separate BUILD document and refer to that from README
 
 ### Changed
 - Building from source now requires Java 8+ and Maven 3.9.x+; build output still targets Java 6
