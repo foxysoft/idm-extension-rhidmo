@@ -135,7 +135,7 @@ function displayDigest() {
   msgInfo "Reproducible SHA-256 of Rhidmo ZIP archive:"
 
   # Output digest to stdout even with --quiet
-  >&3 echo "$digest"
+  >&3 echo 'sha256:'"$digest"
 
 }
 
