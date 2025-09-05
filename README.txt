@@ -14,7 +14,7 @@ fields on load * validating user input on submit * showing custom error
 messages
 
 Rhidmo® is free and open source software available under the Apache License,
-Version 2.0. Its maintainers provide non-commerical community support for
+Version 2.0. Its maintainers provide non-commercial community support for
 Rhidmo® on a best-effort basis. If you encounter any problems, please create a
 GitHub issue in this repository. Commercial maintenance contracts or support
 options do not exist at this time.

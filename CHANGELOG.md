@@ -2,7 +2,7 @@
 All notable changes to Rhidmo&reg; will be documented in this file.
 Rhidmo&reg; adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-The latest version of this changelog can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
+The latest version of this change log can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 ## [Unreleased]
 ### Added
@@ -17,7 +17,7 @@ The latest version of this changelog can be found at https://github.com/foxysoft
 ### Fixed
 - Missing default language in demo content
 - Cleanup in installation manual
-- Update production dependency ByteBuddy to 1.17.5
+- Update production dependency Byte Buddy to 1.17.5
 
 ## [1.2.0] - 2025-06-05
 - Add Rhidmo example packages

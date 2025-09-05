@@ -3,7 +3,7 @@ Rhidmo® Change Log
 All notable changes to Rhidmo® will be documented in this file. Rhidmo® adheres
 to Semantic Versioning.
 
-The latest version of this changelog can be found at https://github.com/
+The latest version of this change log can be found at https://github.com/
 foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 Unreleased
@@ -25,7 +25,7 @@ Fixed
 
   • Missing default language in demo content
   • Cleanup in installation manual
-  • Update production dependency ByteBuddy to 1.17.5
+  • Update production dependency Byte Buddy to 1.17.5
 
 1.2.0 - 2025-06-05
 

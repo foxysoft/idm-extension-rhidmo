@@ -9,7 +9,7 @@ Rhidmo&reg; is a generic implementation of the SAP&reg; Identity Management Exte
 * validating user input on submit
 * showing custom error messages
 
-Rhidmo&reg; is free and open source software available under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt). Its maintainers provide non-commerical community support for Rhidmo&reg; on a best-effort basis. If you encounter any problems, please create a GitHub issue in this repository. Commercial maintenance contracts or support options do not exist at this time.
+Rhidmo&reg; is free and open source software available under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt). Its maintainers provide non-commercial community support for Rhidmo&reg; on a best-effort basis. If you encounter any problems, please create a GitHub issue in this repository. Commercial maintenance contracts or support options do not exist at this time.
 
 ## Download Rhidmo Binaries
 For users who do not wish to build Rhidmo from source, each official Rhidmo release is available for download as a ZIP archive. This ZIP contains:
