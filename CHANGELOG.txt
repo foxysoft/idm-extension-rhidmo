@@ -25,7 +25,7 @@ Fixed
 
   • Missing default language in demo content
   • Cleanup in installation manual
-  • Update production dependency ByteBuddy to 1.17.5 (latest)
+  • Update production dependency ByteBuddy to 1.17.5
 
 1.2.0 - 2025-06-05
 
