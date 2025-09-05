@@ -5,6 +5,9 @@ Rhidmo&reg; adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 The latest version of this change log can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 ## [Unreleased]
+- Nothing at this time
+
+## [1.3.0] - 2025-09-05
 ### Added
 - Add ROADMAP document
 - `mvn clean verify` now generates coverage reports in `./servlet-jar/target/site/jacoco/index.html`
@@ -67,7 +70,8 @@ The latest version of this change log can be found at https://github.com/foxysof
 ### Added
 - First public release
 
-[Unreleased]: ../../compare/1.2.0...HEAD
+[Unreleased]: ../../compare/1.3.0...HEAD
+[1.3.0]:      ../../compare/1.2.0...1.3.0
 [1.2.0]:      ../../compare/1.1.2...1.2.0
 [1.1.2]:      ../../compare/1.1.1...1.1.2
 [1.1.1]:      ../../compare/1.1.0...1.1.1
