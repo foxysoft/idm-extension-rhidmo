@@ -13,10 +13,10 @@ All statements in this section are non-binding. Rhidmo's maintainers plan to imp
 
 | What will be changed? | When do we plan to release? | Is this a breaking change? | Category |
 | --- | --- | --- | --- |
-| Implement reproducible builds | 2025 Q3 | - | Security |
-| Drop support for Java 6 | 2025 Q3 | X | Developer Experience |
-| Add a Software Bill of Materials (SBOM) | 2025 Q3 | - | Security |
-| Update build environment to latest Java LTS| 2025 Q4 | - | Developer Experience |
-| Add static code analysis to build pipeline | 2025 Q4 | - | Security |
+| Drop support for Java 6 | 2025 Q4 | X | Developer Experience |
+| Change EAR versioning from timestamp to semver | 2025 Q4 | X | Maintainability |
+| Add a Software Bill of Materials (SBOM) | 2026 Q1 | - | Security |
+| Update build environment to latest Java LTS| 2026 Q2 | - | Developer Experience |
+| Add static code analysis to build pipeline | 2026 | - | Security |
 | [SLSA Level 3](https://slsa.dev/) compliance | 2026 | - | Security |
 | Improve code coverage of unit tests | 2026 | - | Robustness |
