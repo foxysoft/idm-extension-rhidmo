@@ -5,7 +5,8 @@ Rhidmo&reg; adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 The latest version of this change log can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 ## [Unreleased]
-- Nothing at this time
+### Removed
+- Drop support for Java 6; this release requires Java 8/SAP&reg; NetWeaver 7.50 at runtime
 
 ## [1.3.0] - 2025-09-05
 ### Added
