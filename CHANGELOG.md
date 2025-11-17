@@ -17,6 +17,7 @@ The latest version of this change log can be found at https://github.com/foxysof
 
 ### Changed
 - Building from source now requires Java 8+ and Maven 3.9.x+; build output still targets Java 6
+- Change Rhidmo EAR versioning scheme to MAJOR . MINOR . PATCH . RELEASE_TIMESTAMP
 
 ### Fixed
 - Missing default language in demo content
