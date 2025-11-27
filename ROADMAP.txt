@@ -26,19 +26,15 @@ All statements in this section are non-binding. Rhidmo's maintainers plan to
 implement these measures within the specified time frame, but give no
 guarantees either for the dates or for the provision at all.
 
-   What will be changed?      When do we plan     Is this a        Category
-                                to release?    breaking change?
-Drop support for Java 6      2025 Q4           X                Developer
-                                                                Experience
-Change EAR versioning from   2025 Q4           X                Maintainability
-timestamp to semver
-Add a Software Bill of       2026 Q1           -                Security
+   What will be changed?     When do we plan to     Is this a       Category
+                                  release?      breaking change?
+Add a Software Bill of       2026 Q1            -                 Security
 Materials (SBOM)
-Update build environment to  2026 Q2           -                Developer
-latest Java LTS                                                 Experience
-Add static code analysis to  2026              -                Security
+Update build environment to  2026 Q2            -                 Developer
+latest Java LTS                                                   Experience
+Add static code analysis to  2026               -                 Security
 build pipeline
-SLSA Level 3 compliance      2026              -                Security
-Improve code coverage of     2026              -                Robustness
+SLSA Level 3 compliance      2026               -                 Security
+Improve code coverage of     2026               -                 Robustness
 unit tests
 

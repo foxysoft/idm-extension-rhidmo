@@ -13,8 +13,6 @@ All statements in this section are non-binding. Rhidmo's maintainers plan to imp
 
 | What will be changed? | When do we plan to release? | Is this a breaking change? | Category |
 | --- | --- | --- | --- |
-| Drop support for Java 6 | 2025 Q4 | X | Developer Experience |
-| Change EAR versioning from timestamp to semver | 2025 Q4 | X | Maintainability |
 | Add a Software Bill of Materials (SBOM) | 2026 Q1 | - | Security |
 | Update build environment to latest Java LTS| 2026 Q2 | - | Developer Experience |
 | Add static code analysis to build pipeline | 2026 | - | Security |
