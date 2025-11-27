@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Lambert Giese
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -16,15 +16,16 @@
 package de.foxysoft.rhidmo.test.jdbc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import de.foxysoft.rhidmo.PackageScript;
+import de.foxysoft.rhidmo.RhidmoConfiguration;
+import de.foxysoft.rhidmo.Utl;
+import de.foxysoft.rhidmo.test.util.JdbcUnitTest;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 import org.mockito.Mockito;
-import de.foxysoft.rhidmo.PackageScript;
-import de.foxysoft.rhidmo.RhidmoConfiguration;
-import de.foxysoft.rhidmo.Utl;
-import de.foxysoft.rhidmo.test.util.JdbcUnitTest;
 
 public class TestT002FetchScriptsFromOwnAndOtherPackage extends JdbcUnitTest {
 
@@ -59,12 +60,13 @@ public class TestT002FetchScriptsFromOwnAndOtherPackage extends JdbcUnitTest {
 
     for (int i = 0; i < packageScripts.size(); ++i) {
       PackageScript ps = packageScripts.get(i);
-      assertThat("Script source of [" + ps.getScriptName() + "] not available",
+      assertThat(
+          "Script source of [" + ps.getScriptName() + "] not available",
           ps.getScriptSource() != null);
       assertThat(
           "Script source of [" + ps.getScriptName() + "] doesn't contain function <scriptname>",
           ps.getScriptSource().contains("function " + ps.getScriptName()));
-      
+
       // This final assertion makes sense only for the specific test data hand-crafted
       // for this test. Normally, the script source code wouldn't necessarily contain
       // the package name. Our test data, however, does.
@@ -73,5 +75,4 @@ public class TestT002FetchScriptsFromOwnAndOtherPackage extends JdbcUnitTest {
           ps.getPackageName() == null || ps.getScriptSource().contains(ps.getPackageName()));
     }
   }
-
 }

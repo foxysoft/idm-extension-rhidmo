@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Lambert Giese
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -35,7 +35,9 @@ public class JdbcUnitTest {
   protected String m_testName;
 
   private static final String[] TABLE_NAMES =
-      new String[] {"mc_package_scripts", "mxp_tasks", "mc_package", "idmv_value_basic", "mxi_attributes"};
+      new String[] {
+        "mc_package_scripts", "mxp_tasks", "mc_package", "idmv_value_basic", "mxi_attributes"
+      };
   private static final String SCHEMA_PATH = "/de/foxysoft/rhidmo/test/schema/";
   private static final String DATA_PATH = "/de/foxysoft/rhidmo/test/data/";
 
@@ -54,7 +56,7 @@ public class JdbcUnitTest {
   public void teardown() {
     if (m_connection != null) {
       try {
-        if(false == m_connection.isClosed()) {
+        if (false == m_connection.isClosed()) {
           m_connection.close();
         }
       } catch (SQLException e) {
@@ -94,10 +96,10 @@ public class JdbcUnitTest {
       String sqlName = TABLE_NAMES[i] + ".sql";
 
       String sql = getResourceAsString(SCHEMA_PATH + sqlName);
-      if(sql == null) {
+      if (sql == null) {
         continue;
       }
-      
+
       PreparedStatement ps = null;
       try {
         ps = m_connection.prepareStatement(sql);
@@ -117,7 +119,7 @@ public class JdbcUnitTest {
   private String getResourceAsString(String resourceName) throws IOException {
     String result;
     InputStream is = this.getClass().getResourceAsStream(resourceName);
-    
+
     if (is != null) {
       Reader reader = new InputStreamReader(is);
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -150,5 +152,4 @@ public class JdbcUnitTest {
     }
     return result;
   }
-
 }

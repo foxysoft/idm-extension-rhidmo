@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Lambert Giese
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -21,7 +21,7 @@ import org.slf4j.Marker;
 /**
  * A dummy implementation of org.slf4j.Logger whose class and method declarations are NOT final, so
  * they can be mocked by Mockito.
- * 
+ *
  * @author lambert
  */
 public class Slf4jNopLogger implements Logger {
@@ -36,24 +36,19 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void trace(String msg) {
-  }
+  public void trace(String msg) {}
 
   @Override
-  public void trace(String format, Object arg) {
-  }
+  public void trace(String format, Object arg) {}
 
   @Override
-  public void trace(String format, Object arg1, Object arg2) {
-  }
+  public void trace(String format, Object arg1, Object arg2) {}
 
   @Override
-  public void trace(String format, Object... arguments) {
-  }
+  public void trace(String format, Object... arguments) {}
 
   @Override
-  public void trace(String msg, Throwable t) {
-  }
+  public void trace(String msg, Throwable t) {}
 
   @Override
   public boolean isTraceEnabled(Marker marker) {
@@ -61,24 +56,19 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void trace(Marker marker, String msg) {
-  }
+  public void trace(Marker marker, String msg) {}
 
   @Override
-  public void trace(Marker marker, String format, Object arg) {
-  }
+  public void trace(Marker marker, String format, Object arg) {}
 
   @Override
-  public void trace(Marker marker, String format, Object arg1, Object arg2) {
-  }
+  public void trace(Marker marker, String format, Object arg1, Object arg2) {}
 
   @Override
-  public void trace(Marker marker, String format, Object... argArray) {
-  }
+  public void trace(Marker marker, String format, Object... argArray) {}
 
   @Override
-  public void trace(Marker marker, String msg, Throwable t) {
-  }
+  public void trace(Marker marker, String msg, Throwable t) {}
 
   @Override
   public boolean isDebugEnabled() {
@@ -86,24 +76,19 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void debug(String msg) {
-  }
+  public void debug(String msg) {}
 
   @Override
-  public void debug(String format, Object arg) {
-  }
+  public void debug(String format, Object arg) {}
 
   @Override
-  public void debug(String format, Object arg1, Object arg2) {
-  }
+  public void debug(String format, Object arg1, Object arg2) {}
 
   @Override
-  public void debug(String format, Object... arguments) {
-  }
+  public void debug(String format, Object... arguments) {}
 
   @Override
-  public void debug(String msg, Throwable t) {
-  }
+  public void debug(String msg, Throwable t) {}
 
   @Override
   public boolean isDebugEnabled(Marker marker) {
@@ -111,24 +96,19 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void debug(Marker marker, String msg) {
-  }
+  public void debug(Marker marker, String msg) {}
 
   @Override
-  public void debug(Marker marker, String format, Object arg) {
-  }
+  public void debug(Marker marker, String format, Object arg) {}
 
   @Override
-  public void debug(Marker marker, String format, Object arg1, Object arg2) {
-  }
+  public void debug(Marker marker, String format, Object arg1, Object arg2) {}
 
   @Override
-  public void debug(Marker marker, String format, Object... arguments) {
-  }
+  public void debug(Marker marker, String format, Object... arguments) {}
 
   @Override
-  public void debug(Marker marker, String msg, Throwable t) {
-  }
+  public void debug(Marker marker, String msg, Throwable t) {}
 
   @Override
   public boolean isInfoEnabled() {
@@ -136,24 +116,19 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void info(String msg) {
-  }
+  public void info(String msg) {}
 
   @Override
-  public void info(String format, Object arg) {
-  }
+  public void info(String format, Object arg) {}
 
   @Override
-  public void info(String format, Object arg1, Object arg2) {
-  }
+  public void info(String format, Object arg1, Object arg2) {}
 
   @Override
-  public void info(String format, Object... arguments) {
-  }
+  public void info(String format, Object... arguments) {}
 
   @Override
-  public void info(String msg, Throwable t) {
-  }
+  public void info(String msg, Throwable t) {}
 
   @Override
   public boolean isInfoEnabled(Marker marker) {
@@ -161,24 +136,19 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void info(Marker marker, String msg) {
-  }
+  public void info(Marker marker, String msg) {}
 
   @Override
-  public void info(Marker marker, String format, Object arg) {
-  }
+  public void info(Marker marker, String format, Object arg) {}
 
   @Override
-  public void info(Marker marker, String format, Object arg1, Object arg2) {
-  }
+  public void info(Marker marker, String format, Object arg1, Object arg2) {}
 
   @Override
-  public void info(Marker marker, String format, Object... arguments) {
-  }
+  public void info(Marker marker, String format, Object... arguments) {}
 
   @Override
-  public void info(Marker marker, String msg, Throwable t) {
-  }
+  public void info(Marker marker, String msg, Throwable t) {}
 
   @Override
   public boolean isWarnEnabled() {
@@ -186,24 +156,19 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void warn(String msg) {
-  }
+  public void warn(String msg) {}
 
   @Override
-  public void warn(String format, Object arg) {
-  }
+  public void warn(String format, Object arg) {}
 
   @Override
-  public void warn(String format, Object... arguments) {
-  }
+  public void warn(String format, Object... arguments) {}
 
   @Override
-  public void warn(String format, Object arg1, Object arg2) {
-  }
+  public void warn(String format, Object arg1, Object arg2) {}
 
   @Override
-  public void warn(String msg, Throwable t) {
-  }
+  public void warn(String msg, Throwable t) {}
 
   @Override
   public boolean isWarnEnabled(Marker marker) {
@@ -211,24 +176,19 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void warn(Marker marker, String msg) {
-  }
+  public void warn(Marker marker, String msg) {}
 
   @Override
-  public void warn(Marker marker, String format, Object arg) {
-  }
+  public void warn(Marker marker, String format, Object arg) {}
 
   @Override
-  public void warn(Marker marker, String format, Object arg1, Object arg2) {
-  }
+  public void warn(Marker marker, String format, Object arg1, Object arg2) {}
 
   @Override
-  public void warn(Marker marker, String format, Object... arguments) {
-  }
+  public void warn(Marker marker, String format, Object... arguments) {}
 
   @Override
-  public void warn(Marker marker, String msg, Throwable t) {
-  }
+  public void warn(Marker marker, String msg, Throwable t) {}
 
   @Override
   public boolean isErrorEnabled() {
@@ -236,24 +196,19 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void error(String msg) {
-  }
+  public void error(String msg) {}
 
   @Override
-  public void error(String format, Object arg) {
-  }
+  public void error(String format, Object arg) {}
 
   @Override
-  public void error(String format, Object arg1, Object arg2) {
-  }
+  public void error(String format, Object arg1, Object arg2) {}
 
   @Override
-  public void error(String format, Object... arguments) {
-  }
+  public void error(String format, Object... arguments) {}
 
   @Override
-  public void error(String msg, Throwable t) {
-  }
+  public void error(String msg, Throwable t) {}
 
   @Override
   public boolean isErrorEnabled(Marker marker) {
@@ -261,22 +216,17 @@ public class Slf4jNopLogger implements Logger {
   }
 
   @Override
-  public void error(Marker marker, String msg) {
-  }
+  public void error(Marker marker, String msg) {}
 
   @Override
-  public void error(Marker marker, String format, Object arg) {
-  }
+  public void error(Marker marker, String format, Object arg) {}
 
   @Override
-  public void error(Marker marker, String format, Object arg1, Object arg2) {
-  }
+  public void error(Marker marker, String format, Object arg1, Object arg2) {}
 
   @Override
-  public void error(Marker marker, String format, Object... arguments) {
-  }
+  public void error(Marker marker, String format, Object... arguments) {}
 
   @Override
-  public void error(Marker marker, String msg, Throwable t) {
-  }
+  public void error(Marker marker, String msg, Throwable t) {}
 }
