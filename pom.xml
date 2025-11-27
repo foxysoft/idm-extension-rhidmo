@@ -30,6 +30,8 @@
     <!-- See https://maven.apache.org/guides/mini/guide-reproducible-builds.html -->
     <project.build.outputTimestamp>2025-09-05T14:03:59Z</project.build.outputTimestamp>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <rhidmo.spotless.version>3.1.0</rhidmo.spotless.version>
+    <rhidmo.spotless.javaformat.version>1.28.0</rhidmo.spotless.javaformat.version>
   </properties>
   <build>
     <pluginManagement>
@@ -87,17 +89,15 @@
         <plugin>
           <groupId>com.diffplug.spotless</groupId>
           <artifactId>spotless-maven-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>${rhidmo.spotless.version}</version>
           <configuration>
             <java>
-              <!-- Use Google Java Format -->
               <googleJavaFormat>
-                <version>1.28.0</version>
+                <version>${rhidmo.spotless.javaformat.version}</version>
               </googleJavaFormat>
               <removeUnusedImports/>
             </java>
           </configuration>
-          <!--
           <executions>
             <execution>
               <id>format-check</id>
@@ -106,7 +106,6 @@
               </goals>
             </execution>
           </executions>
-          -->
         </plugin>
         <!-- END: build plugins of module servlet-jar -->
         <!-- BEGIN: build plugins of module ear -->
@@ -211,4 +210,25 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <profiles>
+    <profile>
+      <id>java-8-spotless-disabled</id>
+      <activation>
+        <!-- Activate this profile automatically as fallback on older JDK versions starting with Java 8 -->
+        <!-- since spotless version used for production wouldn't even load on these old JDKs. -->
+        <!-- The purpose is to have a build that can seamlessly COMPILE + FORMAT on Java 17+, -->
+        <!-- but which is still able to COMPILE (without formatting) on Java 8. -->
+        <jdk>[1.8,17)</jdk>
+      </activation>
+      <properties>
+        <!-- Trial and error has shown that this version of spotless build plugin is compatible with Java 8. -->
+        <!-- Declaring this version on Java 8 ensures that the build plugin can be successfully LOADED. -->
+        <rhidmo.spotless.version>2.29.0</rhidmo.spotless.version>
+        <rhidmo.spotless.javaformat.version>1.7</rhidmo.spotless.javaformat.version>
+        <!-- However, never actually RUN spotless in this profile, because the old google-java-format 1.7 -->
+        <!-- supported by that spotless version produces entirely different results from what we want. -->
+        <spotless.skip>true</spotless.skip>
+      </properties>
+    </profile>
+  </profiles>
 </project>
