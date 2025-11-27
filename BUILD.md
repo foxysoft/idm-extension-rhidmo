@@ -8,7 +8,7 @@ Non-reproducible or standard builds are perfect for building Rhidmo for routine 
 
 However, the exact byte sequence of Rhidmo binaries created this way will not be reproducible by others, because it depends on the specific OS and Java version you have used for compiling. Hence, this method cannot be used to publish or verify official Rhidmo releases. For these specific cases, skip to section **[Reproducible Builds](#reproducible-builds)**.
 
-Non-reproducible builds require Java8+ and [Maven 3.9.x+](https://maven.apache.org/) to be installed on your local machine. Maven downloads dependencies from the Internet by default, so your build machine will need to be connected to the Internet.
+Non-reproducible builds require Java 17+ and [Maven 3.9.x+](https://maven.apache.org/) to be installed on your local machine. Maven downloads dependencies from the Internet by default, so your build machine will need to be connected to the Internet. Please note that **building** Rhidmo requires a higher Java version than **running** Rhidmo; the latter is supported down to Java 8.
 
      git clone https://github.com/foxysoft/idm-extension-rhidmo
      cd idm-extension-rhidmo
