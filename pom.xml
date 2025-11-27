@@ -28,7 +28,7 @@
   <properties>
     <!-- Build timestamp must be static for reproducible builds. -->
     <!-- See https://maven.apache.org/guides/mini/guide-reproducible-builds.html -->
-    <project.build.outputTimestamp>2025-09-05T14:03:59Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-11-27T14:03:59Z</project.build.outputTimestamp>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <rhidmo.spotless.version>3.1.0</rhidmo.spotless.version>
     <rhidmo.spotless.javaformat.version>1.28.0</rhidmo.spotless.javaformat.version>
@@ -154,7 +154,48 @@
           <version>3.6.1</version>
           <executions>
             <execution>
-              <id>transform-build-timestamp</id>
+              <!-- Calculating the SDA version number as used in SAP_MANIFEST.MF requires two stages: -->
+              <!-- Stage 1: decide whether this is a release or snapshot (devlopment) version -->
+              <!-- Stage 2: parse temporary properties from stage 1 to compute final SDA version -->
+              <id>transform-build-timestamp-stage-1</id>
+              <goals>
+                <goal>regex-properties</goal>
+              </goals>
+              <configuration>
+                <regexPropertySettings>
+                  <regexPropertySetting>
+                    <!-- Input value: Maven project version + "." + build output timestamp -->
+                    <value>${project.version}.${project.build.outputTimestamp}</value>
+                    <!-- Match RELEASE versions -->
+                    <regex>^(\d+\.\d+\.\d+)\.(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$</regex>
+                    <!-- Output property name -->
+                    <name>rhidmo.ear.version.rel</name>
+                    <!-- If match, output property value will be: -->
+                    <!-- "MATCHED:[" + <SEMVER> + "." + <TIMESTAMP_14_DIGITS> + "]"-->
+                    <replacement>MATCHED:[$1.$2$3$4$5$6$7]</replacement>
+                    <!-- If no match, output property value will be as given in VALUE element (not empty!)-->
+                    <failIfNoMatch>false</failIfNoMatch>
+                  </regexPropertySetting>
+                  <regexPropertySetting>
+                    <!-- Input value: Maven project version + "." + build output timestamp -->
+                    <value>${project.version}.${project.build.outputTimestamp}</value>
+                    <!-- Match SNAPSHOT (development) versions -->
+                    <regex>^(\d+\.\d+\.\d+)-SNAPSHOT.+$</regex>
+                    <!-- Output property name -->
+                    <name>rhidmo.ear.version.dev</name>
+                    <!-- If match, output property value will be: -->
+                    <!-- "MATCHED:[" + <SEMVER> + "." + <DUMMY_14_ZEROES> + "]"-->
+                    <replacement>MATCHED:[$1.00000000000000]</replacement>
+                    <!-- If no match, output property value will be as given in VALUE element (not empty!)-->
+                    <failIfNoMatch>false</failIfNoMatch>
+                  </regexPropertySetting>
+                </regexPropertySettings>
+              </configuration>
+            </execution>
+            <execution>
+              <!-- Now for stage 2: parse the concatenation of ${rhidmo.ear.version.rel}${rhidmo.ear.version.dev} -->
+              <!-- and pick the one that actually MATCHED in stage 1; discard the other -->
+              <id>transform-build-timestamp-stage-2</id>
               <goals>
                 <goal>regex-properties</goal>
               </goals>
@@ -162,32 +203,20 @@
                 <!-- Calculate SDA version number as used in SAP_MANIFEST.MF -->
                 <regexPropertySettings>
                   <regexPropertySetting>
-                    <!-- Input value: Maven project version + "." + build output timestamp -->
-                    <value>${project.version}.${project.build.outputTimestamp}</value>
-                    <!-- Match any release version, i.e. that does not contain "-SNAPSHOT" -->
-                    <!-- ================================================================================ -->
-                    <!-- Note that the negative lookahead capture group (?!-SNAPSHOT) never matches, -->
-                    <!-- hence $2 in the replacement will refer to YYYY of the timestamp already. -->
-                    <!-- ================================================================================ -->
-                    <regex>^(\d+\.\d+\.\d+)(?!-SNAPSHOT)\.(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$</regex>
+                    <!-- Input value -->
+                    <value>${rhidmo.ear.version.rel}:${rhidmo.ear.version.dev}</value>
+                    <!-- Note we must use an ANCHORED regex from start ^ to end $ -->
+                    <!-- otherwise any characters before or after our regex match -->
+                    <!-- will be implicitly included in the replacement. -->
+                    <regex>^.*MATCHED:\[([^\]]+)\].*$</regex>
                     <!-- Output property name -->
                     <name>rhidmo.ear.version</name>
-                    <!-- Output property value for RELEASE versions: -->
-                    <!-- <SEMVER> + "." + <TIMESTAMP_14_DIGITS> -->
-                    <replacement>$1.$2$3$4$5$6$7</replacement>
-                    <failIfNoMatch>false</failIfNoMatch>
-                  </regexPropertySetting>
-                  <regexPropertySetting>
-                    <!-- Input value: Maven project version + "." + build output timestamp -->
-                    <value>${project.version}.${project.build.outputTimestamp}</value>
-                    <!-- Match any development version, i.e. that contains "-SNAPSHOT" -->
-                    <regex>^(\d+\.\d+\.\d+)-SNAPSHOT.+$</regex>
-                    <!-- Output property name -->
-                    <name>rhidmo.ear.version</name>
-                    <!-- Output property value for DEVELOPMENT versions: -->
-                    <!-- <SEMVER> + "." + <DUMMY_14_ZEROES> -->
-                    <replacement>$1.00000000000000</replacement>
-                    <failIfNoMatch>false</failIfNoMatch>
+                    <!-- Final output property value: -->
+                    <!-- For release versions: <SEMVER> + "." + <TIMESTAMP_14_DIGITS> -->
+                    <!-- For snapshot versions: <SEMVER> + "." + <DUMMY_14_ZEROES> -->
+                    <replacement>$1</replacement>
+                    <!-- Failure here in stage 2 would indicate a programming error -->
+                    <failIfNoMatch>true</failIfNoMatch>
                   </regexPropertySetting>
                 </regexPropertySettings>
               </configuration>
