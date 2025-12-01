@@ -5,7 +5,9 @@ Rhidmo&reg; adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 The latest version of this change log can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 ## [Unreleased]
+### Fixed
 - Add missing CHANGELOG update for release 2.0.0
+- Update production dependency Byte Buddy to 1.18.2
 
 ## [2.0.0] - 2025-11-27 (Pre-release)
 ### Removed
