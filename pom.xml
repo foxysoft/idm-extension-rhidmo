@@ -155,7 +155,7 @@
           <executions>
             <execution>
               <!-- Calculating the SDA version number as used in SAP_MANIFEST.MF requires two stages: -->
-              <!-- Stage 1: decide whether this is a release or snapshot (devlopment) version -->
+              <!-- Stage 1: decide whether this is a release or snapshot (development) version -->
               <!-- Stage 2: parse temporary properties from stage 1 to compute final SDA version -->
               <id>transform-build-timestamp-stage-1</id>
               <goals>
