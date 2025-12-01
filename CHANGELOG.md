@@ -5,8 +5,19 @@ Rhidmo&reg; adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 The latest version of this change log can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 ## [Unreleased]
+- Add missing CHANGELOG update for release 2.0.0
+
+## [2.0.0] - 2025-11-27 (Pre-release)
 ### Removed
-- Drop support for Java 6; this release requires Java 8/SAP&reg; NetWeaver 7.50 at runtime
+- Remove support for Java 6; this release requires Java 8/SAP&reg; NetWeaver 7.50 at runtime
+
+### Changed
+- Change Rhidmo EAR versioning scheme; requires version_rule=all on deploy over 1.x
+- Building Rhidmo from source now requires Java 17+
+- Reformat Rhidmo codebase to adhere to Google Java Style
+
+### Added
+- Add documentation on updating and uninstalling Rhidmo to installation manual
 
 ## [1.3.0] - 2025-09-05
 ### Added
@@ -17,7 +28,6 @@ The latest version of this change log can be found at https://github.com/foxysof
 
 ### Changed
 - Building from source now requires Java 8+ and Maven 3.9.x+; build output still targets Java 6
-- Change Rhidmo EAR versioning scheme to MAJOR . MINOR . PATCH . RELEASE_TIMESTAMP
 
 ### Fixed
 - Missing default language in demo content
@@ -72,7 +82,8 @@ The latest version of this change log can be found at https://github.com/foxysof
 ### Added
 - First public release
 
-[Unreleased]: ../../compare/1.3.0...HEAD
+[Unreleased]: ../../compare/2.0.0...HEAD
+[2.0.0]:      ../../compare/1.3.0...2.0.0
 [1.3.0]:      ../../compare/1.2.0...1.3.0
 [1.2.0]:      ../../compare/1.1.2...1.2.0
 [1.1.2]:      ../../compare/1.1.1...1.1.2
