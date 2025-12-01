@@ -8,6 +8,11 @@ foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 Unreleased
 
+Added
+
+  • Expand documentation regarding Rhidmo log configuration in installation
+    manual
+
 Fixed
 
   • Add missing CHANGELOG update for release 2.0.0
