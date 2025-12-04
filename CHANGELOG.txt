@@ -8,7 +8,7 @@ foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 Unreleased
 
-  • Fix unit test failures on Windows #19
+  • Fix unit test failures on Windows #18
 
 2.0.1 - 2025-12-01
 
