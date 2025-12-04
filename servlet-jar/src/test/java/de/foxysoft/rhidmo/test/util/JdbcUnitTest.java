@@ -16,11 +16,15 @@
 package de.foxysoft.rhidmo.test.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -46,7 +50,7 @@ public class JdbcUnitTest {
   }
 
   @Before
-  public void setup() throws SQLException, IOException {
+  public void setup() throws SQLException, IOException, URISyntaxException {
     m_connection = DriverManager.getConnection("jdbc:h2:mem:");
     createTables();
     populateTables();
@@ -65,7 +69,7 @@ public class JdbcUnitTest {
     }
   }
 
-  private void populateTables() throws SQLException {
+  private void populateTables() throws SQLException, URISyntaxException {
     for (int i = 0; i < TABLE_NAMES.length; ++i) {
       String tableName = TABLE_NAMES[i];
       String csvName = m_testName + "_" + tableName + ".csv";
@@ -74,11 +78,22 @@ public class JdbcUnitTest {
         continue;
       }
 
+      // Using an absolute URI as argument to h2's CSVREAD function
+      // will fail on Windows (illegal char <:> at index 2), hence construct
+      // a path relative to the current working directory, which will work cross-platform.
+      Path workingDirAbsolutePath = Paths.get(new File(System.getProperty("user.dir")).toURI());
+      Path csvAbsolutePath = Paths.get(csvUrl.toURI());
+      Path csvRelativePath = workingDirAbsolutePath.relativize(csvAbsolutePath);
+
       Statement s = null;
       try {
         s = m_connection.createStatement();
         s.execute(
-            "insert into " + tableName + " select * from csvread('" + csvUrl.toString() + "')");
+            "insert into "
+                + tableName
+                + " select * from csvread('"
+                + csvRelativePath.toString()
+                + "')");
       } finally {
         if (s != null) {
           try {
