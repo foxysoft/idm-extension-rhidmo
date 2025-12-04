@@ -5,7 +5,7 @@ Rhidmo&reg; adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 The latest version of this change log can be found at https://github.com/foxysoft/idm-extension-rhidmo/blob/master/CHANGELOG.md
 
 ## [Unreleased]
-- Nothing at this time
+- Fix unit test failures on Windows #19
 
 ## [2.0.1] - 2025-12-01
 ### Added
